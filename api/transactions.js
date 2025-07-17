@@ -27,21 +27,13 @@ router.put('/update', async (req, res) => {
 
   // Validasi input
   if (
-    !id || !user_id || !type || !category || !description || !date || amount === undefined
+    !id || !user_id || !type || !category_id || !category || !date || amount === undefined
   ) {
     return res.status(400).json({
       success: false,
       message: 'Data POST tidak lengkap',
       debug: {
-        received_data: req.body,
-        validation: {
-          id_empty: !id,
-          type_empty: !type,
-          category_empty: !category,
-          description_empty: !description,
-          date_empty: !date,
-          amount_null: amount === undefined
-        }
+        received_data: req.body
       }
     });
   }
@@ -58,8 +50,8 @@ router.put('/update', async (req, res) => {
         category,
         description,
         date,
-        parseInt(id),
-        parseInt(user_id)
+        id,        // UUID string
+        user_id    // UUID string
       ]
     );
 
