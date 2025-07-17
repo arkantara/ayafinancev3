@@ -513,6 +513,19 @@ updateDashboardMetrics(transactions);
 hideLoadingState();
     hideLoadingState();
 }
+
+function hideLoadingState() {
+    // Contoh: reset tampilan loading ke normal
+    const elements = [
+        { id: 'totalBalance', class: 'text-lg md:text-3xl font-bold text-gray-800 mobile-text-2xl break-words' },
+        { id: 'monthlyIncome', class: 'text-lg md:text-3xl font-bold text-green-600 mobile-text-2xl break-words' },
+        { id: 'monthlyExpense', class: 'text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words' }
+    ];
+    elements.forEach(el => {
+        const element = document.getElementById(el.id);
+        if (element) element.className = el.class;
+    });
+}
         
         // Show loading state
         function showLoadingState() {
