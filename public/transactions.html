@@ -6,6 +6,7 @@
     <title>Transaksi - ayaFinance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- ADD MOBILE RESPONSIVE CSS -->
     <style>
@@ -499,6 +500,11 @@
     </div>
 
     <script>
+const supabase = window.supabase.createClient(
+  'https://jjieqhvfadoqkahpqdvl.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'
+);
+
         console.log('🔍 Transactions page script loading...');
         
         // Global variables
@@ -512,51 +518,35 @@
         
         // Updated loadTransactions function dengan filter support
         async function loadTransactions() {
-            console.log('📊 Loading ALL transactions...');
-            
-            try {
-                const response = await fetch('../api/transactions.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'read'
-                    })
-                });
-                
-                console.log('📡 API response status:', response.status);
-                const result = await response.json();
-                console.log('📊 API result:', result);
-                
-                if (result.success && result.data) {
-                    // Store both global and original data
-                    window.allTransactions = result.data;
-                    allTransactions = result.data;
-                    originalTransactions = [...result.data]; // Store copy for filtering
-                    
-                    console.log(`✅ Found ${result.data.length} total transactions (all users)`);
-                    console.log('📝 Original transactions stored:', originalTransactions.length);
-                    
-                    renderTransactions(result.data);
-                    updateSummary(result.data);
-                    updateFilterStats(result.data.length, result.data.length);
-                    
-                } else {
-                    console.log('❌ Failed to load transactions:', result.message);
-                    const tableBody = document.getElementById('transactionsTableBody');
-                    if (tableBody) {
-                        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-red-500">Gagal memuat data transaksi</td></tr>';
-                    }
-                }
-            } catch (error) {
-                console.log('❌ Error loading transactions:', error);
-                const tableBody = document.getElementById('transactionsTableBody');
-                if (tableBody) {
-                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-red-500">Error: ' + error.message + '</td></tr>';
-                }
-            }
+    console.log('📊 Loading ALL transactions from Supabase...');
+    const { data, error } = await supabase
+        .from('transactions')
+        .select('*, users(username)')
+        .order('date', { ascending: false });
+
+    if (error) {
+        console.log('❌ Error loading transactions:', error.message);
+        // Tampilkan error di tabel
+        const tableBody = document.getElementById('transactionsTableBody');
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-red-500">Gagal memuat data transaksi</td></tr>';
         }
+        return;
+    }
+
+    // Map username jika pakai relasi
+    const transactions = data.map(t => ({
+        ...t,
+        username: t.users?.username || 'Unknown'
+    }));
+
+    window.allTransactions = transactions;
+    allTransactions = transactions;
+    originalTransactions = [...transactions];
+    renderTransactions(transactions);
+    updateSummary(transactions);
+    updateFilterStats(transactions.length, transactions.length);
+}
         
         // Render transactions function
         function renderTransactions(transactions) {
@@ -869,34 +859,18 @@ function resetFilters() {
         
         // Delete transaction
         async function deleteTransaction(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-                return;
-            }
-        
-            try {
-                const response = await fetch('../api/transactions.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'delete',
-                        id: id,
-                        user_id: 1
-                    })
-                });
-        
-                const result = await response.json();
-                
-                if (result.success) {
-                    console.log('✅ Transaction deleted');
-                    await loadTransactions();
-                } else {
-                    alert('❌ Gagal menghapus: ' + result.message);
-                }
-            } catch (error) {
-                console.error('❌ Delete error:', error);
-                alert('❌ Error: ' + error.message);
-            }
-        }
+    if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) return;
+    const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+    if (error) {
+        alert('Gagal menghapus transaksi: ' + error.message);
+        return;
+    }
+    alert('Transaksi berhasil dihapus!');
+    await loadTransactions();
+}
         
         // Update categories options
         function updateCategoriesOptions(type) {
@@ -995,6 +969,56 @@ function resetFilters() {
             console.log('✅ Transaction type buttons initialized');
         }
         
+        async function handleInsertTransaction(formData) {
+    const { error } = await supabase
+        .from('transactions')
+        .insert([formData]);
+    if (error) {
+        alert('Gagal menambah transaksi: ' + error.message);
+        return false;
+    }
+    alert('Transaksi berhasil ditambahkan!');
+    await loadTransactions();
+    return true;
+}
+
+document.getElementById('transactionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = {
+    user_id: currentUser.id,
+    type: document.getElementById('transactionType').value,
+    amount: parseFloat(document.getElementById('transactionAmount').value),
+    category_id: parseInt(document.getElementById('transactionCategory').value),
+    category: document.getElementById('transactionCategory').options[
+        document.getElementById('transactionCategory').selectedIndex
+    ].text,
+    description: document.getElementById('transactionDescription').value,
+    date: document.getElementById('transactionDate').value
+};
+    if (window.editMode && window.editMode.isEditing) {
+        await handleUpdateTransaction(window.editMode.transactionId, formData);
+        window.editMode = null;
+    } else {
+        await handleInsertTransaction(formData);
+    }
+    document.getElementById('transactionModal').classList.add('hidden');
+});
+
+async function handleUpdateTransaction(id, updateData) {
+    const { error } = await supabase
+        .from('transactions')
+        .update(updateData)
+        .eq('id', id);
+    if (error) {
+        alert('Gagal update transaksi: ' + error.message);
+        return false;
+    }
+    alert('Transaksi berhasil diupdate!');
+    await loadTransactions();
+    return true;
+}
+
+
         // Initialize modal handlers
         function initializeModalHandlers() {
             console.log('🔧 Initializing modal handlers...');
@@ -1683,18 +1707,7 @@ document.addEventListener('click', function(e) {
         
         console.log('✅ Script loaded successfully');
 
-        // Contoh fetch dari frontend (dashboard.html)
-fetch('/api/transactions/update', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    id, user_id, type, amount, category_id, category, description, date
-  })
-})
-.then(res => res.json())
-.then(data => {
-  // handle response
-});
+
         </script>
         
 </body>
