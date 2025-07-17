@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard - ayaFinance</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <!-- ADD MOBILE RESPONSIVE CSS -->
+        <style>
+            /* Mobile First Responsive Design */
+            @media (max-width: 768px) {
+                /* Navigation responsive */
+                .nav-links {
+                    display: none;
+                }
+                
+                /* KEEP DESKTOP PROFILE VISIBLE ON MOBILE TOO */
+                .desktop-profile {
+                    display: flex !important;
+                }
+                
+                /* Hide notification on mobile to save space */
+                .mobile-hide-notification {
+                    display: none !important;
+                }
+                
+                /* Adjust profile dropdown for mobile */
+                #profileDropdown {
+                    right: 0;
+                    left: auto;
+                    width: 200px !important;
+                    margin-top: 0.5rem;
+                }
+                
+                /* Stats cards responsive */
+                .stats-grid {
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 0.75rem !important;
+                }
+                
+                /* Charts responsive */
+                .chart-container {
+                    height: 250px !important;
+                }
+                
+                /* Transaction list responsive */
+                .transaction-item {
+                    padding: 0.75rem !important;
+                }
+                
+                /* Card responsive */
+                .mobile-card {
+                    padding: 1rem !important;
+                }
+                
+                /* Hide less important elements */
+                .mobile-hide {
+                    display: none !important;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                /* Extra small devices */
+                .stats-grid {
+                    grid-template-columns: 1fr !important;
+                }
+                
+                /* Even smaller profile dropdown */
+                #profileDropdown {
+                    width: 180px !important;
+                }
+                
+                .chart-container {
+                    height: 200px !important;
+                }
+            }
+            
+            /* Touch friendly elements */
+            .touch-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Prevent zoom on input focus */
+            input[type="date"], 
+            input[type="text"], 
+            input[type="number"], 
+            select {
+                font-size: 16px !important;
+            }
+            .mobile-text-2xl {
+    font-size: 1.5rem !important;
+}
+
+@media (max-width: 640px) {
+    .mobile-text-2xl {
+        font-size: 1.25rem !important;
+    }
+}
+
+/* Prevent text overflow */
+.break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Ensure minimum width for flex children */
+.min-w-0 {
+    min-width: 0;
+}
+        </style>
+    </head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-wallet text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">ayaFinance</h1>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-6 nav-links">
+                    <a href="dashboard.html" class="text-blue-600 font-medium border-b-2 border-blue-600 pb-1">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="transactions.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-list mr-2"></i>Transaksi
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-800 touch-btn">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Profile Section - VISIBLE ON ALL SCREENS -->
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <!-- Notification - Hide on mobile -->
+                    <div class="relative hidden md:block">
+                        <button id="notificationBtn" class="text-gray-600 hover:text-gray-800 relative touch-btn">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <!-- User Info - Hide on mobile -->
+                    <div class="text-right hidden md:block">
+                        <p id="welcomeUser" class="text-sm font-medium text-gray-700">Admin</p>
+                        <p class="text-xs text-gray-500">Administrator</p>
+                    </div>
+                    
+                    <!-- Profile Button - SINGLE INSTANCE -->
+                    <div class="relative">
+                        <button id="profileBtn" class="flex items-center space-x-1 md:space-x-2 bg-gray-100 hover:bg-gray-200 px-2 md:px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-500 touch-btn">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs hidden md:inline"></i>
+                        </button>
+                        
+                        <!-- Profile Dropdown - SINGLE INSTANCE -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border hidden z-50">
+                            <div class="py-1">
+                                <div class="px-4 py-2 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-gray-700">Administrator</p>
+                                    <p class="text-xs text-gray-500">admin@ayafinance.com</p>
+                                </div>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-user mr-2"></i>Profile Saya
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-cog mr-2"></i>Pengaturan
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-bell mr-2"></i>Notifikasi
+                                </a>
+                                <hr class="my-1">
+                                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 py-4">
+                <div class="space-y-3">
+                    <a href="dashboard.html" class="block text-blue-600 font-medium py-2">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="transactions.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-list mr-2"></i>Transaksi
+                    </a>
+                    <div class="border-t border-gray-200 pt-3 mt-3">
+                        <div class="flex items-center space-x-3 py-2">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p id="mobileWelcomeUser" class="text-sm font-medium text-gray-700">Admin</p>
+                                <p class="text-xs text-gray-500">Administrator</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Kelola Kategori</h2>
+            <p class="text-gray-600">Kelola kategori pemasukan dan pengeluaran Anda</p>
+        </div>
+
+        <!-- Add Category Button -->
+        <div class="mb-6">
+            <button id="addCategoryBtn" class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                Tambah Kategori Baru
+            </button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button id="incomeTab" class="tab-button py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
+                        <i class="fas fa-arrow-up mr-2"></i>Pemasukan
+                    </button>
+                    <button id="expenseTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-arrow-down mr-2"></i>Pengeluaran
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Categories Grid -->
+        <div id="categoriesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Categories will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500">Memuat kategori...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <i class="fas fa-tags text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500">Belum ada kategori. Tambah kategori baru untuk memulai!</p>
+        </div>
+    </div>
+
+    <!-- Add/Edit Category Modal -->
+    <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div class="p-6">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="modalTitle" class="text-xl font-semibold text-gray-800">
+                        <i class="fas fa-plus-circle text-blue-500 mr-2"></i>
+                        Tambah Kategori
+                    </h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Category Form -->
+                <form id="categoryForm" class="space-y-4">
+                    <input type="hidden" id="categoryId" name="id">
+                    
+                    <!-- Category Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kategori</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="incomeTypeBtn" class="type-btn bg-green-50 border-2 border-green-200 text-green-700 py-3 px-4 rounded-lg font-medium hover:bg-green-100 transition-colors">
+                                <i class="fas fa-arrow-up mr-2"></i>
+                                Pemasukan
+                            </button>
+                            <button type="button" id="expenseTypeBtn" class="type-btn bg-red-50 border-2 border-red-200 text-red-700 py-3 px-4 rounded-lg font-medium hover:bg-red-100 transition-colors">
+                                <i class="fas fa-arrow-down mr-2"></i>
+                                Pengeluaran
+                            </button>
+                        </div>
+                        <input type="hidden" id="categoryType" name="type" required>
+                    </div>
+
+                    <!-- Category Name -->
+                    <div>
+                        <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-2">Nama Kategori</label>
+                        <input type="text" id="categoryName" name="name" class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan nama kategori" required>
+                    </div>
+
+                    <!-- Icon Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Icon</label>
+                        <div class="grid grid-cols-6 gap-2" id="iconGrid">
+                            <!-- Icons will be loaded here -->
+                        </div>
+                        <input type="hidden" id="categoryIcon" name="icon" value="fas fa-circle">
+                    </div>
+
+                    <!-- Color Selection -->
+                    <div>
+                        <label for="categoryColor" class="block text-sm font-medium text-gray-700 mb-2">Pilih Warna</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="categoryColor" name="color" value="#3B82F6" class="color-picker">
+                            <span class="text-sm text-gray-600">Pilih warna untuk kategori</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button id="submitBtn" type="submit" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                            Simpan Kategori
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🏷️ Categories page loading...');
+        
+        // Global variables
+        let currentUser = null;
+        let currentTab = 'income';
+        let categories = [];
+        let isEditing = false;
+        let editingId = null;
+        
+        // Available icons
+        const availableIcons = [
+            'fas fa-briefcase', 'fas fa-laptop-code', 'fas fa-chart-line', 'fas fa-store',
+            'fas fa-gift', 'fas fa-utensils', 'fas fa-car', 'fas fa-shopping-bag',
+            'fas fa-file-invoice', 'fas fa-heart', 'fas fa-gamepad', 'fas fa-graduation-cap',
+            'fas fa-home', 'fas fa-plane', 'fas fa-book', 'fas fa-music',
+            'fas fa-camera', 'fas fa-coffee', 'fas fa-bicycle', 'fas fa-basketball-ball',
+            'fas fa-paint-brush', 'fas fa-tools', 'fas fa-gas-pump', 'fas fa-credit-card'
+        ];
+        
+        // Check login status
+        function checkLogin() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            return user;
+        }
+        
+        // Load categories from API
+        async function loadCategories(type = '') {
+            console.log('📦 Loading categories for type:', type || 'all');
+            
+            try {
+                showLoadingState();
+                
+                const formData = new FormData();
+                formData.append('action', 'read');
+                formData.append('user_id', '1');
+                if (type) {
+                    formData.append('type', type);
+                }
+                
+                const response = await fetch('../api/categories.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('📦 Categories API result:', result);
+                
+                if (result.success) {
+                    categories = result.data;
+                    displayCategories(type || currentTab);
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading categories:', error);
+                showErrorState();
+            }
+        }
+        
+        // Display categories
+        function displayCategories(type) {
+            const container = document.getElementById('categoriesContainer');
+            const filteredCategories = categories.filter(cat => cat.type === type);
+            
+            hideLoadingState();
+            
+            if (filteredCategories.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            hideEmptyState();
+            
+            container.innerHTML = filteredCategories.map(category => `
+                <div class="category-item bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: ${category.color}20;">
+                                <i class="${category.icon}" style="color: ${category.color}; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${category.name}</h4>
+                                <p class="text-sm text-gray-500">${category.is_default ? 'Default' : 'Custom'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            ${!category.is_default ? `
+                                <button onclick="editCategory(${category.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteCategory(${category.id})" class="text-red-600 hover:text-red-800 p-2">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : `
+                                <span class="text-gray-400 text-sm">Tidak dapat diedit</span>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Dibuat: ${new Date(category.created_at).toLocaleDateString('id-ID')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Show/hide states
+        function showLoadingState() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('categoriesContainer').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+        
+        function hideLoadingState() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('categoriesContainer').classList.remove('hidden');
+        }
+        
+        function showEmptyState() {
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('categoriesContainer').classList.add('hidden');
+        }
+        
+        function hideEmptyState() {
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+        
+        function showErrorState() {
+            hideLoadingState();
+            document.getElementById('categoriesContainer').innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                    <p class="text-red-500">Gagal memuat kategori. Silakan coba lagi.</p>
+                </div>
+            `;
+        }
+        
+        // Switch tabs
+        function switchTab(type) {
+            currentTab = type;
+            
+            // Update tab buttons
+            const incomeTab = document.getElementById('incomeTab');
+            const expenseTab = document.getElementById('expenseTab');
+            
+            if (type === 'income') {
+                incomeTab.classList.add('border-blue-500', 'text-blue-600');
+                incomeTab.classList.remove('border-transparent', 'text-gray-500');
+                expenseTab.classList.remove('border-blue-500', 'text-blue-600');
+                expenseTab.classList.add('border-transparent', 'text-gray-500');
+            } else {
+                expenseTab.classList.add('border-blue-500', 'text-blue-600');
+                expenseTab.classList.remove('border-transparent', 'text-gray-500');
+                incomeTab.classList.remove('border-blue-500', 'text-blue-600');
+                incomeTab.classList.add('border-transparent', 'text-gray-500');
+            }
+            
+            // Display categories for selected type
+            displayCategories(type);
+        }
+        
+        // Setup icon grid
+        function setupIconGrid() {
+            const iconGrid = document.getElementById('iconGrid');
+            iconGrid.innerHTML = availableIcons.map(icon => `
+                <button type="button" class="icon-option w-10 h-10 border-2 border-gray-200 rounded-lg hover:border-blue-500 flex items-center justify-center transition-colors" data-icon="${icon}">
+                    <i class="${icon}"></i>
+                </button>
+            `).join('');
+            
+            // Add click handlers
+            document.querySelectorAll('.icon-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active state from all icons
+                    document.querySelectorAll('.icon-option').forEach(b => {
+                        b.classList.remove('border-blue-500', 'bg-blue-50');
+                        b.classList.add('border-gray-200');
+                    });
+                    
+                    // Add active state to clicked icon
+                    this.classList.remove('border-gray-200');
+                    this.classList.add('border-blue-500', 'bg-blue-50');
+                    
+                    // Set icon value
+                    document.getElementById('categoryIcon').value = this.dataset.icon;
+                });
+            });
+            
+            // Select first icon by default
+            if (iconGrid.children.length > 0) {
+                iconGrid.children[0].click();
+            }
+        }
+        
+        // Select category type
+        function selectCategoryType(type) {
+            const incomeBtn = document.getElementById('incomeTypeBtn');
+            const expenseBtn = document.getElementById('expenseTypeBtn');
+            const typeInput = document.getElementById('categoryType');
+            
+            // Reset buttons
+            incomeBtn.classList.remove('bg-green-200', 'border-green-400');
+            incomeBtn.classList.add('bg-green-50', 'border-green-200');
+            expenseBtn.classList.remove('bg-red-200', 'border-red-400');
+            expenseBtn.classList.add('bg-red-50', 'border-red-200');
+            
+            // Highlight selected
+            if (type === 'income') {
+                incomeBtn.classList.remove('bg-green-50', 'border-green-200');
+                incomeBtn.classList.add('bg-green-200', 'border-green-400');
+            } else {
+                expenseBtn.classList.remove('bg-red-50', 'border-red-200');
+                expenseBtn.classList.add('bg-red-200', 'border-red-400');
+            }
+            
+            typeInput.value = type;
+        }
+        
+        // Open add category modal
+        function openAddModal() {
+            isEditing = false;
+            editingId = null;
+            
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-500 mr-2"></i>Tambah Kategori';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            
+            // Set default type based on current tab
+            selectCategoryType(currentTab);
+            
+            // Setup icon grid
+            setupIconGrid();
+            
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+        
+        // Edit category
+        function editCategory(id) {
+            const category = categories.find(c => c.id == id);
+            if (!category) return;
+            
+            isEditing = true;
+            editingId = id;
+            
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit text-blue-500 mr-2"></i>Edit Kategori';
+            document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categoryColor').value = category.color;
+            
+            selectCategoryType(category.type);
+            setupIconGrid();
+            
+            // Select current icon
+            const iconBtn = document.querySelector(`[data-icon="${category.icon}"]`);
+            if (iconBtn) {
+                iconBtn.click();
+            }
+            
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+        
+        // Delete category
+        async function deleteCategory(id) {
+            const category = categories.find(c => c.id == id);
+            if (!category) return;
+            
+            if (!confirm(`Apakah Anda yakin ingin menghapus kategori "${category.name}"?`)) {
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('id', id);
+                formData.append('user_id', '1');
+                
+                const response = await fetch('../api/categories.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Kategori berhasil dihapus!');
+                    loadCategories();
+                } else {
+                    alert('❌ ' + result.message);
+                }
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+        
+        // Handle form submission
+        async function handleFormSubmission(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+                
+                const formData = new FormData();
+                formData.append('action', isEditing ? 'update' : 'create');
+                formData.append('user_id', '1');
+                
+                if (isEditing) {
+                    formData.append('id', editingId);
+                }
+                
+                formData.append('name', document.getElementById('categoryName').value.trim());
+                formData.append('type', document.getElementById('categoryType').value);
+                formData.append('icon', document.getElementById('categoryIcon').value);
+                formData.append('color', document.getElementById('categoryColor').value);
+                
+                const response = await fetch('../api/categories.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('categoryModal').classList.add('hidden');
+                    alert('✅ Kategori berhasil ' + (isEditing ? 'diupdate' : 'ditambahkan') + '!');
+                    loadCategories();
+                } else {
+                    alert('❌ ' + result.message);
+                }
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Categories page loaded');
+            
+            // Check login
+            currentUser = checkLogin();
+            if (!currentUser) return;
+            
+            // Load categories
+            loadCategories();
+            
+            // Tab event listeners
+            document.getElementById('incomeTab').addEventListener('click', () => switchTab('income'));
+            document.getElementById('expenseTab').addEventListener('click', () => switchTab('expense'));
+            
+            // Modal event listeners
+            document.getElementById('addCategoryBtn').addEventListener('click', openAddModal);
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('categoryModal').classList.add('hidden');
+            });
+            
+            // Type selection
+            document.getElementById('incomeTypeBtn').addEventListener('click', () => selectCategoryType('income'));
+            document.getElementById('expenseTypeBtn').addEventListener('click', () => selectCategoryType('expense'));
+            
+            // Form submission
+            document.getElementById('categoryForm').addEventListener('submit', handleFormSubmission);
+            
+            // Close modal on backdrop click
+            document.getElementById('categoryModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+            
+            console.log('✅ Categories page initialized');
+        });
+        
+        // Make functions global for onclick handlers
+        window.editCategory = editCategory;
+        window.deleteCategory = deleteCategory;
+        
+        console.log('✅ Categories script loaded');
+    </script>
+</body>
+</html>

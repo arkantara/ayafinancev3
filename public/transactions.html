@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi - ayaFinance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ADD MOBILE RESPONSIVE CSS -->
+    <style>
+        /* Mobile First Responsive Design */
+        @media (max-width: 768px) {
+            /* Navigation responsive */
+            .nav-links {
+                display: none;
+            }
+            
+            /* KEEP DESKTOP PROFILE VISIBLE ON MOBILE TOO */
+            .desktop-profile {
+                display: flex !important;
+            }
+            
+            /* Hide notification on mobile to save space */
+            .mobile-hide-notification {
+                display: none !important;
+            }
+            
+            /* Adjust profile dropdown for mobile */
+            #profileDropdown {
+                right: 0;
+                left: auto;
+                width: 200px !important;
+                margin-top: 0.5rem;
+            }
+            
+            /* Filter section mobile */
+            .filter-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Table responsive */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-table {
+                min-width: 100%;
+            }
+            
+            .mobile-table th,
+            .mobile-table td {
+                padding: 0.5rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Hide less important columns on mobile */
+            .mobile-hide {
+                display: none !important;
+            }
+            
+            /* Action buttons mobile */
+            .mobile-actions {
+                flex-direction: column !important;
+                gap: 0.25rem !important;
+            }
+            
+            .mobile-btn {
+                padding: 0.5rem !important;
+                font-size: 0.75rem !important;
+                min-width: auto !important;
+            }
+            
+            /* Modal responsive */
+            .modal-content {
+                margin: 1rem !important;
+                max-height: 90vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Card responsive */
+            .mobile-card {
+                padding: 1rem !important;
+            }
+            
+            /* Stats responsive */
+            .stats-mobile {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.75rem !important;
+            }
+            
+            /* Filter toggle mobile */
+            .filter-mobile {
+                display: block !important;
+            }
+            
+            .filter-desktop {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra small devices */
+            .mobile-table th,
+            .mobile-table td {
+                padding: 0.375rem !important;
+                font-size: 0.75rem !important;
+            }
+            
+            .stats-mobile {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Even smaller profile dropdown on very small screens */
+            #profileDropdown {
+                width: 180px !important;
+            }
+        }
+        
+        /* Touch friendly elements */
+        .touch-btn {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Prevent zoom on input focus */
+        input[type="date"], 
+        input[type="text"], 
+        input[type="number"], 
+        select {
+            font-size: 16px !important;
+        }
+        
+        /* Custom scrollbar for mobile */
+        .table-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-wallet text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">ayaFinance</h1>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-6 nav-links">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="transactions.html" class="text-blue-600 font-medium border-b-2 border-blue-600 pb-1">
+                        <i class="fas fa-list mr-2"></i>Transaksi
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button - Only show on smaller screens -->
+                <div class="md:hidden lg:hidden xl:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-800 touch-btn mr-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Profile Section - ALWAYS VISIBLE with responsive design -->
+                <div class="flex items-center space-x-2 md:space-x-4 desktop-profile">
+                    <!-- Notification - Hide on mobile -->
+                    <div class="relative mobile-hide-notification">
+                        <button id="notificationBtn" class="text-gray-600 hover:text-gray-800 relative touch-btn">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Profile Info - Responsive -->
+                    <div class="flex items-center space-x-2 md:space-x-3">
+                        <!-- User info - Hide text on mobile -->
+                        <div class="text-right hidden md:block">
+                            <p id="welcomeUser" class="text-sm font-medium text-gray-700">Admin</p>
+                            <p class="text-xs text-gray-500">Administrator</p>
+                        </div>
+                        
+                        <!-- Profile Button - Always visible -->
+                        <div class="relative">
+                            <button id="profileBtn" class="flex items-center space-x-1 md:space-x-2 bg-gray-100 hover:bg-gray-200 px-2 md:px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-500 touch-btn">
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-sm"></i>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 text-xs hidden md:inline"></i>
+                            </button>
+                            
+                            <!-- Profile Dropdown - Responsive -->
+                            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border hidden z-50">
+                                <div class="py-1">
+                                    <div class="px-4 py-2 border-b border-gray-100">
+                                        <p class="text-sm font-medium text-gray-700">Administrator</p>
+                                        <p class="text-xs text-gray-500">admin@ayafinance.com</p>
+                                    </div>
+                                    <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-user mr-2"></i>Profile Saya
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-cog mr-2"></i>Pengaturan
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                                    </a>
+                                    <hr class="my-1">
+                                    <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu - SIMPLIFIED for navigation only -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 py-4">
+                <div class="space-y-3">
+                    <a href="dashboard.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="transactions.html" class="block text-blue-600 font-medium py-2">
+                        <i class="fas fa-list mr-2"></i>Transaksi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Transaksi</h1>
+                <p class="text-gray-600 mt-1 text-sm md:text-base">Kelola semua transaksi keuangan Anda</p>
+            </div>
+            <button id="addTransactionBtn" 
+                    class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-4 md:px-6 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg touch-btn">
+                <i class="fas fa-plus mr-2"></i>
+                <span class="hidden sm:inline">Tambah Transaksi</span>
+                <span class="sm:hidden">Tambah</span>
+            </button>
+        </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 mobile-card">
+        <!-- Mobile Filter Toggle -->
+        <div class="md:hidden filter-mobile mb-4">
+            <button id="toggleFilterBtn" class="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-between touch-btn">
+                <span>
+                    <i class="fas fa-filter mr-2"></i>
+                    Filter & Pencarian
+                </span>
+                <i id="filterToggleIcon" class="fas fa-chevron-down transition-transform"></i>
+            </button>
+        </div>
+        
+        <!-- Filter Content -->
+        <div id="filterContent" class="hidden md:block filter-desktop">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter & Pencarian Transaksi</h3>
+            
+            <!-- Search Input -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pencarian</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" 
+                           class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Cari berdasarkan deskripsi, kategori, atau user...">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 filter-grid">
+                <!-- Date Range -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dari Tanggal</label>
+                    <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sampai Tanggal</label>
+                    <input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Transaction Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Transaksi</label>
+                    <select id="typeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Semua</option>
+                        <option value="income">Pemasukan</option>
+                        <option value="expense">Pengeluaran</option>
+                    </select>
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                    <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row items-end space-y-2 sm:space-y-0 sm:space-x-2">
+                    <button id="applyFilter" class="w-full sm:flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200 touch-btn">
+                        <i class="fas fa-filter mr-2"></i>
+                        <span class="hidden sm:inline">Filter</span>
+                        <span class="sm:hidden">Filter</span>
+                    </button>
+                    <button id="resetFilter" class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200 touch-btn">
+                        <i class="fas fa-undo mr-1"></i>
+                        <span class="hidden sm:inline">Reset</span>
+                        <span class="sm:hidden">Reset</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Filter Stats -->
+            <div id="filterStats" class="text-sm text-gray-600 mt-2"></div>
+        </div>
+    </div>
+
+       
+        <!-- Transactions Table -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="p-4 md:p-6">
+                <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Daftar Transaksi</h2>
+                
+                <!-- Table container -->
+                <div class="overflow-x-auto table-container">
+                    <table id="transactionsTable" class="w-full table-fixed mobile-table">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="w-12 md:w-16 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                <th class="w-20 md:w-24 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th class="w-20 md:w-24 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
+                                <th class="w-20 md:w-24 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider mobile-hide">Kategori</th>
+                                <th class="w-24 md:w-32 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                <th class="w-20 md:w-24 px-3 md:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                                <th class="w-16 md:w-20 px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider mobile-hide">User</th>
+                                <th class="w-16 md:w-16 px-3 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Dynamic content will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination Controls -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between px-3 md:px-6 py-3 mt-4 border-t border-gray-200">
+                    <div class="flex items-center text-sm text-gray-500 mb-2 sm:mb-0">
+                        <span id="paginationInfo">Menampilkan 1-10 dari 15 transaksi</span>
+                    </div>
+                    <div class="flex items-center justify-center sm:justify-end space-x-2">
+                        <button id="prevPageBtn" 
+                                class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-btn"
+                                disabled>
+                            <i class="fas fa-chevron-left mr-1"></i>
+                            <span class="hidden sm:inline">Sebelumnya</span>
+                        </button>
+                        
+                        <div id="pageNumbers" class="flex space-x-1">
+                            <!-- Page numbers will be inserted here -->
+                        </div>
+                        
+                        <button id="nextPageBtn" 
+                                class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-btn">
+                            <span class="hidden sm:inline">Selanjutnya</span>
+                            <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Tambah Transaksi</h3>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Transaction Form -->
+                <form id="transactionForm" class="space-y-6">
+                    <!-- Transaction Type Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Jenis Transaksi</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="incomeBtn" 
+                                    class="transaction-type-btn flex items-center justify-center p-4 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-200" 
+                                    data-type="income">
+                                <div class="text-center">
+                                    <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-arrow-up text-green-600 text-lg"></i>
+                                    </div>
+                                    <div class="font-semibold text-gray-700 text-sm">Pemasukan</div>
+                                </div>
+                            </button>
+                            <button type="button" id="expenseBtn"
+                                    class="transaction-type-btn flex items-center justify-center p-4 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all duration-200" 
+                                    data-type="expense">
+                                <div class="text-center">
+                                    <div class="bg-red-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-arrow-down text-red-600 text-lg"></i>
+                                    </div>
+                                    <div class="font-semibold text-gray-700 text-sm">Pengeluaran</div>
+                                </div>
+                            </button>
+                        </div>
+                        <input type="hidden" id="transactionType" name="type" required>
+                    </div>
+
+                    <!-- Amount Input -->
+                    <div>
+                        <label for="transactionAmount" class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 font-medium">Rp</span>
+                            </div>
+                            <input type="text" id="transactionAmount" name="amount" required 
+                                   class="block w-full pl-12 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                                   placeholder="0" 
+                                   inputmode="numeric">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Masukkan nominal tanpa titik atau koma</p>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div>
+                        <label for="transactionCategory" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                        <select id="transactionCategory" name="category" required 
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                            <option value="">Pilih kategori</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="transactionDescription" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                        <textarea id="transactionDescription" name="description" rows="3" 
+                                  class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                  placeholder="Deskripsi transaksi (opsional)"></textarea>
+                    </div>
+
+                    <!-- Date Input -->
+                    <div>
+                        <label for="transactionDate" class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                        <input type="date" id="transactionDate" name="date" required 
+                               class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-3 pt-6">
+                        <button type="button" id="cancelBtn" 
+                                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-times mr-2"></i>Batal
+                        </button>
+                        <button type="submit" id="saveTransactionBtn" 
+                                class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105">
+                            <i class="fas fa-save mr-2"></i>Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 Transactions page script loading...');
+        
+        // Global variables
+        let currentUser = null;
+        let allTransactions = [];
+        let originalTransactions = []; // Store original data for filtering
+        let filteredTransactions = []; // Store filtered data
+        let currentPage = 1; // Add pagination
+        let itemsPerPage = 10; // Add pagination
+        let totalPages = 1; // Add pagination
+        
+        // Updated loadTransactions function dengan filter support
+        async function loadTransactions() {
+            console.log('📊 Loading ALL transactions...');
+            
+            try {
+                const response = await fetch('../api/transactions.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'read'
+                    })
+                });
+                
+                console.log('📡 API response status:', response.status);
+                const result = await response.json();
+                console.log('📊 API result:', result);
+                
+                if (result.success && result.data) {
+                    // Store both global and original data
+                    window.allTransactions = result.data;
+                    allTransactions = result.data;
+                    originalTransactions = [...result.data]; // Store copy for filtering
+                    
+                    console.log(`✅ Found ${result.data.length} total transactions (all users)`);
+                    console.log('📝 Original transactions stored:', originalTransactions.length);
+                    
+                    renderTransactions(result.data);
+                    updateSummary(result.data);
+                    updateFilterStats(result.data.length, result.data.length);
+                    
+                } else {
+                    console.log('❌ Failed to load transactions:', result.message);
+                    const tableBody = document.getElementById('transactionsTableBody');
+                    if (tableBody) {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-red-500">Gagal memuat data transaksi</td></tr>';
+                    }
+                }
+            } catch (error) {
+                console.log('❌ Error loading transactions:', error);
+                const tableBody = document.getElementById('transactionsTableBody');
+                if (tableBody) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-red-500">Error: ' + error.message + '</td></tr>';
+                }
+            }
+        }
+        
+        // Render transactions function
+        function renderTransactions(transactions) {
+    const tableBody = document.getElementById('transactionsTableBody');
+    
+    if (!transactions || transactions.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-8">Tidak ada transaksi</td></tr>';
+        updatePaginationControls(0, 0);
+        return;
+    }
+    
+    // Calculate pagination
+    totalPages = Math.ceil(transactions.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedTransactions = transactions.slice(startIndex, endIndex);
+    
+    console.log(`📄 Pagination: Page ${currentPage}/${totalPages}, Items ${startIndex + 1}-${Math.min(endIndex, transactions.length)} of ${transactions.length}`);
+    
+    let html = '';
+    
+    paginatedTransactions.forEach((transaction, index) => {
+        const username = transaction.username || 'Unknown User';
+        const rowNumber = startIndex + index + 1;
+        
+        html += `
+            <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                <td class="py-3 md:py-4 px-2 md:px-4 text-center font-medium text-gray-600 text-xs md:text-sm">${rowNumber}</td>
+                <td class="py-3 md:py-4 px-2 md:px-4 text-gray-800 text-xs md:text-sm">${transaction.date}</td>
+                <td class="py-3 md:py-4 px-2 md:px-4">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        transaction.type === 'income' 
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                            : 'bg-rose-100 text-rose-800 border border-rose-200'
+                    }">
+                        <i class="fas ${transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down'} mr-1"></i>
+                        <span class="hidden sm:inline">${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
+                        <span class="sm:hidden">${transaction.type === 'income' ? 'IN' : 'OUT'}</span>
+                    </span>
+                </td>
+                <td class="py-3 md:py-4 px-2 md:px-4 mobile-hide">
+                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                        ${transaction.category}
+                    </span>
+                </td>
+                <td class="py-3 md:py-4 px-2 md:px-4 text-gray-700 text-xs md:text-sm">
+                    <div class="truncate max-w-24 md:max-w-32" title="${transaction.description}">${transaction.description}</div>
+                    <!-- Show category on mobile under description -->
+                    <div class="md:hidden text-xs text-gray-500 mt-1">
+                        <span class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                            ${transaction.category}
+                        </span>
+                    </div>
+                </td>
+                <td class="py-3 md:py-4 px-2 md:px-4 font-semibold text-right text-xs md:text-sm ${
+                    transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
+                }">
+                    ${formatCurrency(parseFloat(transaction.amount))}
+                </td>
+                <td class="py-3 md:py-4 px-2 md:px-4 mobile-hide">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <i class="fas fa-user mr-1"></i><span class="hidden lg:inline">${username}</span><span class="lg:hidden">${username.substring(0, 3)}</span>
+                    </span>
+                </td>
+                <td class="py-3 md:py-4 px-2 md:px-4">
+                    <div class="flex items-center justify-center space-x-1 mobile-actions">
+                        <!-- Mobile-optimized Edit Button -->
+                        <button onclick="editTransaction(${transaction.id})" 
+                                class="group relative inline-flex items-center justify-center p-1.5 md:p-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-md md:rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 touch-btn mobile-btn"
+                                title="Edit Transaksi">
+                            <i class="fas fa-edit text-xs md:text-sm"></i>
+                            <span class="hidden md:inline ml-1">Edit</span>
+                        </button>
+                        
+                        <!-- Mobile-optimized Delete Button -->
+                        <button onclick="deleteTransaction(${transaction.id})" 
+                                class="group relative inline-flex items-center justify-center p-1.5 md:p-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 rounded-md md:rounded-lg hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 touch-btn mobile-btn"
+                                title="Hapus Transaksi">
+                            <i class="fas fa-trash-alt text-xs md:text-sm"></i>
+                            <span class="hidden md:inline ml-1">Hapus</span>
+                        </button>
+                    </div>
+                    <!-- Show user on mobile under actions -->
+                    <div class="md:hidden text-center mt-1">
+                        <span class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-700">
+                            <i class="fas fa-user mr-1"></i>${username.substring(0, 6)}
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+    
+    // Update pagination controls
+    updatePaginationControls(transactions.length, paginatedTransactions.length);
+    
+    console.log('✅ Data rendered with mobile responsive design');
+}
+
+        // Add pagination control functions
+function updatePaginationControls(totalItems, displayedItems) {
+    // Update pagination info
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        paginationInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${totalItems} transaksi`;
+    }
+    
+    // Update prev/next buttons
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    
+    if (prevBtn) {
+        prevBtn.disabled = currentPage <= 1;
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentPage >= totalPages;
+    }
+    
+    // Update page numbers
+    updatePageNumbers();
+}
+
+function updatePageNumbers() {
+    const pageNumbersContainer = document.getElementById('pageNumbers');
+    if (!pageNumbersContainer) return;
+    
+    pageNumbersContainer.innerHTML = '';
+    
+    // Show max 5 page numbers
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        pageBtn.className = `px-3 py-2 text-sm rounded-lg transition duration-200 ${
+            i === currentPage 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+        }`;
+        
+        pageBtn.addEventListener('click', () => {
+            currentPage = i;
+            // Re-render current data
+            const currentData = filteredTransactions.length > 0 ? filteredTransactions : originalTransactions;
+            renderTransactions(currentData);
+        });
+        
+        pageNumbersContainer.appendChild(pageBtn);
+    }
+}
+
+function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    
+    currentPage = page;
+    const currentData = filteredTransactions.length > 0 ? filteredTransactions : originalTransactions;
+    renderTransactions(currentData);
+}
+
+function goToPrevPage() {
+    if (currentPage > 1) {
+        goToPage(currentPage - 1);
+    }
+}
+
+function goToNextPage() {
+    if (currentPage < totalPages) {
+        goToPage(currentPage + 1);
+    }
+}
+
+// Update applyFilters to reset to page 1
+function applyFilters() {
+    console.log('🔍 Applying filters...');
+    console.log('📝 Original transactions available:', originalTransactions?.length || 0);
+    
+    if (!originalTransactions || originalTransactions.length === 0) {
+        console.log('❌ No original data to filter');
+        return;
+    }
+    
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const searchQuery = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+    
+    console.log('📝 Filter values:', { startDate, endDate, typeFilter, categoryFilter, searchQuery });
+    
+    let filtered = [...originalTransactions];
+    console.log('🎯 Starting with', filtered.length, 'transactions');
+    
+    // Apply date filter
+    if (startDate) {
+        const beforeFilter = filtered.length;
+        filtered = filtered.filter(t => t.date >= startDate);
+        console.log(`📅 Start date filter: ${beforeFilter} -> ${filtered.length}`);
+    }
+    
+    if (endDate) {
+        const beforeFilter = filtered.length;
+        filtered = filtered.filter(t => t.date <= endDate);
+        console.log(`📅 End date filter: ${beforeFilter} -> ${filtered.length}`);
+    }
+    
+    // Apply type filter
+    if (typeFilter) {
+        const beforeFilter = filtered.length;
+        filtered = filtered.filter(t => t.type === typeFilter);
+        console.log(`🏷️ Type filter: ${beforeFilter} -> ${filtered.length}`);
+    }
+    
+    // Apply category filter
+    if (categoryFilter) {
+        const beforeFilter = filtered.length;
+        filtered = filtered.filter(t => t.category === categoryFilter);
+        console.log(`📂 Category filter: ${beforeFilter} -> ${filtered.length}`);
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+        const beforeFilter = filtered.length;
+        filtered = filtered.filter(t => 
+            (t.description && t.description.toLowerCase().includes(searchQuery)) ||
+            (t.category && t.category.toLowerCase().includes(searchQuery)) ||
+            (t.username && t.username.toLowerCase().includes(searchQuery))
+        );
+        console.log(`🔍 Search filter: ${beforeFilter} -> ${filtered.length}`);
+    }
+    
+    filteredTransactions = filtered;
+    currentPage = 1; // Reset to page 1 when filtering
+    
+    console.log('✅ Final filtered result:', filtered.length, 'transactions');
+    
+    renderTransactions(filtered);
+    updateSummary(filtered);
+    updateFilterStats(filtered.length, originalTransactions.length);
+}
+
+// Update resetFilters to reset pagination
+function resetFilters() {
+    console.log('🔄 Resetting filters...');
+    
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('categoryFilter').value = '';
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    setDefaultDateRange();
+    
+    currentPage = 1; // Reset to page 1
+    filteredTransactions = []; // Clear filtered data
+    
+    if (originalTransactions && originalTransactions.length > 0) {
+        renderTransactions(originalTransactions);
+        updateSummary(originalTransactions);
+        updateFilterStats(originalTransactions.length, originalTransactions.length);
+    }
+    
+    console.log('✅ Filters reset');
+}
+        
+        // Update summary
+        function updateSummary(transactions) {
+            const income = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            
+            const expense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            
+            const balance = income - expense;
+        
+            const totalIncomeEl = document.getElementById('totalIncome');
+            const totalExpenseEl = document.getElementById('totalExpense');
+            const totalBalanceEl = document.getElementById('totalBalance');
+            
+            if (totalIncomeEl) totalIncomeEl.textContent = formatCurrency(income);
+            if (totalExpenseEl) totalExpenseEl.textContent = formatCurrency(expense);
+            if (totalBalanceEl) totalBalanceEl.textContent = formatCurrency(balance);
+        }
+        
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        // Delete transaction
+        async function deleteTransaction(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+                return;
+            }
+        
+            try {
+                const response = await fetch('../api/transactions.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        id: id,
+                        user_id: 1
+                    })
+                });
+        
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Transaction deleted');
+                    await loadTransactions();
+                } else {
+                    alert('❌ Gagal menghapus: ' + result.message);
+                }
+            } catch (error) {
+                console.error('❌ Delete error:', error);
+                alert('❌ Error: ' + error.message);
+            }
+        }
+        
+        // Update categories options
+        function updateCategoriesOptions(type) {
+            console.log('🔄 Updating categories for type:', type);
+            
+            const categorySelect = document.getElementById('transactionCategory');
+            if (!categorySelect) {
+                console.log('❌ Category select not found');
+                return;
+            }
+            
+            categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
+            
+            let categories = [];
+            
+            if (type === 'income') {
+                categories = [
+                    { value: 'salary', text: 'Gaji' },
+                    { value: 'freelance', text: 'Freelance' },
+                    { value: 'investment', text: 'Investasi' },
+                    { value: 'business', text: 'Bisnis' },
+                    { value: 'gift', text: 'Hadiah' },
+                    { value: 'other_income', text: 'Lainnya' }
+                ];
+            } else if (type === 'expense') {
+                categories = [
+                    { value: 'food', text: 'Makanan' },
+                    { value: 'transportation', text: 'Transportasi' },
+                    { value: 'shopping', text: 'Belanja' },
+                    { value: 'bills', text: 'Tagihan' },
+                    { value: 'health', text: 'Kesehatan' },
+                    { value: 'entertainment', text: 'Hiburan' },
+                    { value: 'education', text: 'Pendidikan' },
+                    { value: 'other_expense', text: 'Lainnya' }
+                ];
+            }
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.value;
+                option.textContent = category.text;
+                categorySelect.appendChild(option);
+            });
+            
+            console.log('✅ Categories updated:', categories.length, 'options');
+        }
+        
+        // Initialize transaction type buttons
+        function initializeTransactionTypeButtons() {
+            console.log('🔧 Initializing transaction type buttons...');
+            
+            const incomeBtn = document.getElementById('incomeBtn');
+            const expenseBtn = document.getElementById('expenseBtn');
+            const typeInput = document.getElementById('transactionType');
+            
+            if (incomeBtn) {
+                incomeBtn.addEventListener('click', function() {
+                    console.log('💰 Income button clicked');
+                    
+                    [incomeBtn, expenseBtn].forEach(btn => {
+                        btn.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                        btn.classList.add('border-gray-200');
+                    });
+                    
+                    incomeBtn.classList.remove('border-gray-200');
+                    incomeBtn.classList.add('border-green-500', 'bg-green-50');
+                    
+                    if (typeInput) {
+                        typeInput.value = 'income';
+                    }
+                    
+                    updateCategoriesOptions('income');
+                });
+            }
+            
+            if (expenseBtn) {
+                expenseBtn.addEventListener('click', function() {
+                    console.log('💸 Expense button clicked');
+                    
+                    [incomeBtn, expenseBtn].forEach(btn => {
+                        btn.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                        btn.classList.add('border-gray-200');
+                    });
+                    
+                    expenseBtn.classList.remove('border-gray-200');
+                    expenseBtn.classList.add('border-red-500', 'bg-red-50');
+                    
+                    if (typeInput) {
+                        typeInput.value = 'expense';
+                    }
+                    
+                    updateCategoriesOptions('expense');
+                });
+            }
+            
+            console.log('✅ Transaction type buttons initialized');
+        }
+        
+        // Initialize modal handlers
+        function initializeModalHandlers() {
+            console.log('🔧 Initializing modal handlers...');
+            
+            const addBtn = document.getElementById('addTransactionBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    console.log('➕ Add transaction clicked');
+                    
+                    const form = document.getElementById('transactionForm');
+                    if (form) {
+                        form.reset();
+                    }
+                    
+                    window.editMode = null;
+                    
+                    document.querySelector('#transactionModal h3').textContent = 'Tambah Transaksi';
+                    document.getElementById('saveTransactionBtn').innerHTML = '<i class="fas fa-save mr-2"></i>Simpan';
+                    
+                    const incomeBtn = document.getElementById('incomeBtn');
+                    const expenseBtn = document.getElementById('expenseBtn');
+                    [incomeBtn, expenseBtn].forEach(btn => {
+                        if (btn) {
+                            btn.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                            btn.classList.add('border-gray-200');
+                        }
+                    });
+                    
+                    const categorySelect = document.getElementById('transactionCategory');
+                    if (categorySelect) {
+                        categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
+                    }
+                    
+                    const dateInput = document.getElementById('transactionDate');
+                    if (dateInput) {
+                        dateInput.value = new Date().toISOString().split('T')[0];
+                    }
+                    
+                    document.getElementById('transactionModal').classList.remove('hidden');
+                });
+            }
+            
+            const closeBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            [closeBtn, cancelBtn].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        console.log('❌ Closing modal');
+                        document.getElementById('transactionModal').classList.add('hidden');
+                        window.editMode = null;
+                    });
+                }
+            });
+            
+            console.log('✅ Modal handlers initialized');
+        }
+        
+        // Edit transaction
+        function editTransaction(id) {
+            console.log('🔧 Editing transaction ID:', id);
+            
+            const transactions = window.allTransactions || allTransactions;
+            
+            if (!transactions || transactions.length === 0) {
+                alert('❌ Data transaksi belum dimuat');
+                return;
+            }
+            
+            const transaction = transactions.find(t => {
+                const transactionId = parseInt(t.id);
+                const targetId = parseInt(id);
+                return transactionId === targetId;
+            });
+            
+            if (!transaction) {
+                console.log('❌ Transaction not found with ID:', id);
+                alert('❌ Transaksi tidak ditemukan');
+                return;
+            }
+            
+            console.log('📝 Transaction data found:', transaction);
+            
+            const incomeBtn = document.getElementById('incomeBtn');
+            const expenseBtn = document.getElementById('expenseBtn');
+            
+            [incomeBtn, expenseBtn].forEach(btn => {
+                if (btn) {
+                    btn.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                    btn.classList.add('border-gray-200');
+                }
+            });
+            
+            if (transaction.type === 'income' && incomeBtn) {
+                incomeBtn.classList.remove('border-gray-200');
+                incomeBtn.classList.add('border-green-500', 'bg-green-50');
+            } else if (transaction.type === 'expense' && expenseBtn) {
+                expenseBtn.classList.remove('border-gray-200');
+                expenseBtn.classList.add('border-red-500', 'bg-red-50');
+            }
+            
+            const typeInput = document.getElementById('transactionType');
+            if (typeInput) {
+                typeInput.value = transaction.type;
+            }
+            
+            updateCategoriesOptions(transaction.type);
+            
+            setTimeout(() => {
+                const amountInput = document.getElementById('transactionAmount');
+                if (amountInput) {
+                    amountInput.value = transaction.amount;
+                }
+                
+                const categorySelect = document.getElementById('transactionCategory');
+                if (categorySelect) {
+                    categorySelect.value = transaction.category;
+                }
+                
+                const descInput = document.getElementById('transactionDescription');
+                if (descInput) {
+                    descInput.value = transaction.description || '';
+                }
+                
+                const dateInput = document.getElementById('transactionDate');
+                if (dateInput) {
+                    dateInput.value = transaction.date;
+                }
+                
+                console.log('✅ All form fields populated');
+            }, 200);
+            
+            const modalTitle = document.querySelector('#transactionModal h3');
+            if (modalTitle) {
+                modalTitle.textContent = 'Edit Transaksi';
+            }
+            
+            const saveBtn = document.getElementById('saveTransactionBtn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update';
+            }
+            
+            window.editMode = {
+                isEditing: true,
+                transactionId: parseInt(id)
+            };
+            
+            const modal = document.getElementById('transactionModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+            
+            console.log('✅ Edit modal opened with transaction:', transaction.id);
+        }
+        
+        // ========== FILTER FUNCTIONS ==========
+        
+        // Initialize filter functionality
+        function initializeFilters() {
+    console.log('🔧 Initializing filter functionality...');
+    
+    populateCategoryFilter();
+    setDefaultDateRange(); // Set 30 hari terakhir sebagai default
+    addQuickDateRangeButtons(); // Add quick range buttons
+    
+    const applyFilterBtn = document.getElementById('applyFilter');
+    const resetFilterBtn = document.getElementById('resetFilter');
+    
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', applyFilters);
+    }
+    
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', resetFilters);
+    }
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            debounceSearch(this.value);
+        });
+    }
+    
+    console.log('✅ Filter functionality initialized with 30-day default range');
+}
+        
+        // Populate category filter
+        function populateCategoryFilter() {
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (!categoryFilter) return;
+            
+            categoryFilter.innerHTML = '<option value="">Semua Kategori</option>';
+            
+            const allCategories = [
+                { value: 'salary', text: 'Gaji' },
+                { value: 'freelance', text: 'Freelance' },
+                { value: 'investment', text: 'Investasi' },
+                { value: 'business', text: 'Bisnis' },
+                { value: 'gift', text: 'Hadiah' },
+                { value: 'other_income', text: 'Pemasukan Lainnya' },
+                { value: 'food', text: 'Makanan' },
+                { value: 'transportation', text: 'Transportasi' },
+                { value: 'shopping', text: 'Belanja' },
+                { value: 'bills', text: 'Tagihan' },
+                { value: 'health', text: 'Kesehatan' },
+                { value: 'entertainment', text: 'Hiburan' },
+                { value: 'education', text: 'Pendidikan' },
+                { value: 'other_expense', text: 'Pengeluaran Lainnya' }
+            ];
+            
+            allCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.value;
+                option.textContent = category.text;
+                categoryFilter.appendChild(option);
+            });
+            
+            console.log('✅ Category filter populated');
+        }
+        
+        // Set default date range
+        function setDefaultDateRange() {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30); // 30 hari ke belakang
+    
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    
+    if (startDateInput) {
+        startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+    }
+    
+    if (endDateInput) {
+        endDateInput.value = today.toISOString().split('T')[0];
+    }
+    
+    console.log('✅ Default date range set - Last 30 days:', 
+                thirtyDaysAgo.toISOString().split('T')[0], 
+                'to', 
+                today.toISOString().split('T')[0]);
+}
+        
+        // Apply filters
+        function applyFilters() {
+            console.log('🔍 Applying filters...');
+            console.log('📝 Original transactions available:', originalTransactions?.length || 0);
+            
+            if (!originalTransactions || originalTransactions.length === 0) {
+                console.log('❌ No original data to filter');
+                return;
+            }
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const searchQuery = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            
+            console.log('📝 Filter values:', { startDate, endDate, typeFilter, categoryFilter, searchQuery });
+            
+            let filtered = [...originalTransactions];
+            console.log('🎯 Starting with', filtered.length, 'transactions');
+            
+            // Apply date filter
+            if (startDate) {
+                const beforeFilter = filtered.length;
+                filtered = filtered.filter(t => t.date >= startDate);
+                console.log(`📅 Start date filter: ${beforeFilter} -> ${filtered.length}`);
+            }
+            
+            if (endDate) {
+                const beforeFilter = filtered.length;
+                filtered = filtered.filter(t => t.date <= endDate);
+                console.log(`📅 End date filter: ${beforeFilter} -> ${filtered.length}`);
+            }
+            
+            // Apply type filter
+            if (typeFilter) {
+                const beforeFilter = filtered.length;
+                filtered = filtered.filter(t => t.type === typeFilter);
+                console.log(`🏷️ Type filter: ${beforeFilter} -> ${filtered.length}`);
+            }
+            
+            // Apply category filter
+            if (categoryFilter) {
+                const beforeFilter = filtered.length;
+                filtered = filtered.filter(t => t.category === categoryFilter);
+                console.log(`📂 Category filter: ${beforeFilter} -> ${filtered.length}`);
+            }
+            
+            // Apply search filter
+            if (searchQuery) {
+                const beforeFilter = filtered.length;
+                filtered = filtered.filter(t => 
+                    (t.description && t.description.toLowerCase().includes(searchQuery)) ||
+                    (t.category && t.category.toLowerCase().includes(searchQuery)) ||
+                    (t.username && t.username.toLowerCase().includes(searchQuery))
+                );
+                console.log(`🔍 Search filter: ${beforeFilter} -> ${filtered.length}`);
+            }
+            
+            filteredTransactions = filtered;
+            
+            console.log('✅ Final filtered result:', filtered.length, 'transactions');
+            
+            renderTransactions(filtered);
+            updateSummary(filtered);
+            updateFilterStats(filtered.length, originalTransactions.length);
+        }
+        
+        // Reset filters
+        function resetFilters() {
+    console.log('🔄 Resetting filters...');
+    
+    // Clear filter inputs first
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('categoryFilter').value = '';
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Set default date range (last 30 days)
+    setDefaultDateRange();
+    
+    currentPage = 1; // Reset to page 1
+    filteredTransactions = []; // Clear filtered data
+    
+    if (originalTransactions && originalTransactions.length > 0) {
+        renderTransactions(originalTransactions);
+        updateSummary(originalTransactions);
+        updateFilterStats(originalTransactions.length, originalTransactions.length);
+    }
+    
+    console.log('✅ Filters reset with last 30 days range');
+}
+
+function addQuickDateRangeButtons() {
+    console.log('🔧 Adding quick date range buttons...');
+    
+    // Find the filter section to add quick buttons
+    const filterSection = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5');
+    
+    if (filterSection) {
+        // Create quick range buttons container
+        const quickRangeDiv = document.createElement('div');
+        quickRangeDiv.className = 'col-span-full mb-4';
+        quickRangeDiv.innerHTML = `
+            <label class="block text-sm font-medium text-gray-700 mb-2">Range Cepat</label>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" id="today-btn" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
+                    Hari Ini
+                </button>
+                <button type="button" id="last7days-btn" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
+                    7 Hari Terakhir
+                </button>
+                <button type="button" id="last30days-btn" class="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md transition-colors font-medium">
+                    30 Hari Terakhir
+                </button>
+                <button type="button" id="thismonth-btn" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
+                    Bulan Ini
+                </button>
+                <button type="button" id="lastmonth-btn" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
+                    Bulan Lalu
+                </button>
+            </div>
+        `;
+        
+        // Insert at the beginning of filter section
+        filterSection.insertBefore(quickRangeDiv, filterSection.firstChild);
+        
+        // Add event listeners
+        addQuickRangeEventListeners();
+    }
+}
+
+function addQuickRangeEventListeners() {
+    const today = new Date();
+    
+    // Today
+    document.getElementById('today-btn')?.addEventListener('click', function() {
+        setDateRange(today, today);
+        updateActiveQuickButton(this);
+    });
+    
+    // Last 7 days
+    document.getElementById('last7days-btn')?.addEventListener('click', function() {
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        setDateRange(sevenDaysAgo, today);
+        updateActiveQuickButton(this);
+    });
+    
+    // Last 30 days (default)
+    document.getElementById('last30days-btn')?.addEventListener('click', function() {
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        setDateRange(thirtyDaysAgo, today);
+        updateActiveQuickButton(this);
+    });
+    
+    // This month
+    document.getElementById('thismonth-btn')?.addEventListener('click', function() {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        setDateRange(firstDay, today);
+        updateActiveQuickButton(this);
+    });
+    
+    // Last month
+    document.getElementById('lastmonth-btn')?.addEventListener('click', function() {
+        const firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastDayLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        setDateRange(firstDayLastMonth, lastDayLastMonth);
+        updateActiveQuickButton(this);
+    });
+}
+
+function setDateRange(startDate, endDate) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    
+    if (startDateInput) {
+        startDateInput.value = startDate.toISOString().split('T')[0];
+    }
+    
+    if (endDateInput) {
+        endDateInput.value = endDate.toISOString().split('T')[0];
+    }
+    
+    console.log('📅 Date range set:', startDate.toISOString().split('T')[0], 'to', endDate.toISOString().split('T')[0]);
+}
+
+function updateActiveQuickButton(activeButton) {
+    // Reset all buttons
+    const buttons = document.querySelectorAll('[id$="-btn"]');
+    buttons.forEach(btn => {
+        btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors';
+    });
+    
+    // Set active button
+    activeButton.className = 'px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md transition-colors font-medium';
+}
+        
+        // Update filter statistics
+        function updateFilterStats(filtered, total) {
+            const statsElement = document.getElementById('filterStats');
+            if (statsElement) {
+                if (filtered === total) {
+                    statsElement.textContent = `Menampilkan semua ${total} transaksi`;
+                    statsElement.className = 'text-sm text-gray-600 mt-2';
+                } else {
+                    statsElement.textContent = `Menampilkan ${filtered} dari ${total} transaksi`;
+                    statsElement.className = 'text-sm text-blue-600 mt-2 font-medium';
+                }
+            }
+        }
+        
+        // Debounced search
+        let searchTimeout;
+        function debounceSearch(query) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                console.log('🔍 Searching for:', query);
+                applyFilters();
+            }, 300);
+        }
+        
+        // Debug functions
+        window.debugFilterData = function() {
+            console.log('🔍 DEBUG FILTER DATA:');
+            console.log('Original transactions:', originalTransactions?.length || 0);
+            console.log('Window.allTransactions:', window.allTransactions?.length || 0);
+            
+            if (originalTransactions && originalTransactions.length > 0) {
+                console.log('Sample dates:', originalTransactions.slice(0, 5).map(t => `ID: ${t.id}, Date: ${t.date}`));
+            }
+            
+            const startDate = document.getElementById('startDate')?.value;
+            const endDate = document.getElementById('endDate')?.value;
+            console.log('Filter inputs - Start:', startDate, 'End:', endDate);
+        };
+        
+        // Initialize page
+        // Add mobile handlers to existing DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM ready, initializing page...');
+    
+    currentUser = { id: 1, name: 'admin' };
+    console.log('✅ User found:', currentUser.name);
+    
+    initializeTransactionTypeButtons();
+    initializeModalHandlers();
+    initializeFilters();
+
+    // Add pagination event listeners
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', goToPrevPage);
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', goToNextPage);
+    }
+    
+    // ADD MOBILE HANDLERS HERE:
+    // Mobile menu handler
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent profile dropdown from opening
+        mobileMenu.classList.toggle('hidden');
+        
+        // Close profile dropdown if open
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileDropdown) {
+            profileDropdown.classList.add('hidden');
+        }
+    });
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(e) {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuBtn && mobileMenu && 
+        !mobileMenuBtn.contains(e.target) && 
+        !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+    }
+});
+    
+    // Mobile filter toggle
+    const toggleFilterBtn = document.getElementById('toggleFilterBtn');
+    const filterContent = document.getElementById('filterContent');
+    const filterToggleIcon = document.getElementById('filterToggleIcon');
+    
+    if (toggleFilterBtn && filterContent) {
+        toggleFilterBtn.addEventListener('click', function() {
+            const isHidden = filterContent.classList.contains('hidden');
+            
+            if (isHidden) {
+                filterContent.classList.remove('hidden');
+                filterToggleIcon.classList.add('rotate-180');
+            } else {
+                filterContent.classList.add('hidden');
+                filterToggleIcon.classList.remove('rotate-180');
+            }
+        });
+    }
+    
+// ADD PROFILE DROPDOWN HANDLERS HERE (INSERT AT LINE 1519):
+    // Profile dropdown handler
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const notificationBtn = document.getElementById('notificationBtn');
+    
+    // Toggle profile dropdown
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('👤 Profile button clicked');
+            
+            // Close other dropdowns first
+            const allDropdowns = document.querySelectorAll('[id$="Dropdown"]');
+            allDropdowns.forEach(dropdown => {
+                if (dropdown !== profileDropdown) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current dropdown
+            profileDropdown.classList.toggle('hidden');
+        });
+    }
+    
+    // Notification button handler
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔔 Notification button clicked');
+            alert('Fitur notifikasi akan segera hadir!');
+        });
+    }
+    
+    // Logout button handler
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🚪 Logout button clicked');
+            
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('currentUser');
+                sessionStorage.clear();
+                window.location.href = '../index.html';
+            }
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        
+        if (profileBtn && profileDropdown && 
+            !profileBtn.contains(e.target) && 
+            !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('hidden');
+        }
+    });
+    
+    // Close dropdowns on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const allDropdowns = document.querySelectorAll('[id$="Dropdown"]');
+            allDropdowns.forEach(dropdown => {
+                dropdown.classList.add('hidden');
+            });
+        }
+    });
+    
+    // Profile menu item handlers
+    const profileMenuItems = document.querySelectorAll('#profileDropdown a');
+    profileMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const text = this.textContent.trim();
+            
+            console.log('📋 Profile menu clicked:', text);
+            
+            switch(text) {
+                case 'Profile Saya':
+                    alert('Fitur Profile akan segera hadir!');
+                    break;
+                case 'Pengaturan':
+                    alert('Fitur Pengaturan akan segera hadir!');
+                    break;
+                case 'Notifikasi':
+                    alert('Fitur Notifikasi akan segera hadir!');
+                    break;
+                default:
+                    console.log('Unknown menu item:', text);
+            }
+            
+            // Close dropdown after selection
+            const profileDropdown = document.getElementById('profileDropdown');
+            if (profileDropdown) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+    });
+    
+    // Update desktop welcome user
+    const welcomeElement = document.getElementById('welcomeUser');
+    if (welcomeElement) {
+        welcomeElement.textContent = 'Admin';
+    }
+
+    // Update mobile welcome user (THIS STAYS WHERE IT IS - LINE 1520)
+    const mobileWelcomeElement = document.getElementById('mobileWelcomeUser');
+    if (mobileWelcomeElement) {
+        mobileWelcomeElement.textContent = 'Admin'; // Update with actual user data
+    }
+    
+    console.log('✅ Profile dropdown handlers initialized');
+    console.log('✅ Mobile handlers initialized');
+    
+    // Continue with existing form handler and loadTransactions...
+    // [Keep all existing form submission code]
+    
+    loadTransactions();
+    
+    console.log('✅ Page initialized with mobile responsive features');
+});
+        
+        console.log('✅ Script loaded successfully');
+
+        // Contoh fetch dari frontend (dashboard.html)
+fetch('/api/transactions/update', {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    id, user_id, type, amount, category_id, category, description, date
+  })
+})
+.then(res => res.json())
+.then(data => {
+  // handle response
+});
+        </script>
+        
+</body>
+</html>
