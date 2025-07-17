@@ -473,6 +473,10 @@ const supabase = window.supabase.createClient(
             return formatCurrencySimple(amount); // Use simple version
         }
         
+        function showError(message) {
+    alert('❌ ' + message);
+}
+
         // Load dashboard data from database
         async function loadDashboardData() {
     console.log('📊 Loading dashboard data...');
@@ -484,6 +488,11 @@ const supabase = window.supabase.createClient(
         window.location.href = 'login.html';
         return;
     }
+
+    // Pastikan hanya UUID
+if (currentUser.id) {
+    currentUser.id = currentUser.id.split(':')[0];
+}
 
     // Ambil semua transaksi user
     const { data: transactions, error } = await supabase

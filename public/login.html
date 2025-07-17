@@ -153,8 +153,13 @@
                 } else {
                     showSuccess('Login berhasil! Mengalihkan...');
                     // Simpan user ke localStorage jika perlu
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    setTimeout(() => {
+                    if (data && data.user) {
+    // Pastikan hanya UUID (tanpa tambahan :1)
+    if (data.user.id) {
+        data.user.id = data.user.id.split(':')[0];
+    }
+    localStorage.setItem('currentUser', JSON.stringify(data.user));
+}                    setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1200);
                 }
