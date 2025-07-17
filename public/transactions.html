@@ -957,6 +957,7 @@ document.getElementById('transactionForm').addEventListener('submit', async func
 });
 
 async function handleUpdateTransaction(id, updateData) {
+    console.log('DATA YANG DIKIRIM:', updateData, 'ID:', id);
     const { error } = await supabase
         .from('transactions')
         .update(updateData)
