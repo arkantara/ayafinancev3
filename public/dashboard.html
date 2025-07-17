@@ -6,6 +6,7 @@
         <title>Dashboard - ayaFinance</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         
         <!-- ADD MOBILE RESPONSIVE CSS -->
         <style>
@@ -429,6 +430,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
+const supabase = window.supabase.createClient(
+  'https://jjieqhvfadoqkahpqdvl.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'
+);
+
         console.log('📊 Dashboard script loading...');
         
         // Global variables
@@ -469,48 +475,35 @@
         
         // Load dashboard data from database
         async function loadDashboardData() {
-            console.log('📊 Loading dashboard data...');
-            
-            try {
-                // Show loading state
-                showLoadingState();
-                
-                const response = await fetch('../api/transactions.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'read'
-                    })
-                });
-                
-                console.log('📡 API response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('📊 API result:', result);
-                
-                if (result.success && result.data) {
-                    allTransactions = result.data;
-                    console.log(`✅ Found ${result.data.length} total transactions`);
-                    
-                    // Calculate and update dashboard metrics
-                    updateDashboardMetrics(result.data);
-                    
-                } else {
-                    console.log('❌ Failed to load dashboard data:', result.message);
-                    showErrorState();
-                }
-                
-            } catch (error) {
-                console.log('❌ Error loading dashboard data:', error);
-                showErrorState();
-            }
-        }
+    console.log('📊 Loading dashboard data...');
+    showLoadingState();
+
+    // Ambil user dari localStorage
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Ambil semua transaksi user
+    const { data: transactions, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', currentUser.id);
+
+    if (error) {
+        showError('Gagal mengambil data transaksi');
+        return;
+    }
+
+    if (error) {
+    showError('Gagal mengambil data transaksi');
+    return;
+}
+updateDashboardMetrics(transactions);
+hideLoadingState();
+    hideLoadingState();
+}
         
         // Show loading state
         function showLoadingState() {
@@ -766,35 +759,31 @@
         categorySelect.disabled = true;
         
         // Fetch categories from API
-        const formData = new FormData();
-        formData.append('action', 'read');
-        formData.append('user_id', '1');
-        formData.append('type', type);
-        
-        const response = await fetch('../api/categories.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success && result.data) {
-            // Clear and populate categories
-            categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
-            
-            result.data.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id; // Use category ID instead of slug
-                option.textContent = category.name;
-                option.dataset.icon = category.icon;
-                option.dataset.color = category.color;
-                categorySelect.appendChild(option);
-            });
-            
-            console.log(`✅ Loaded ${result.data.length} categories for type: ${type}`);
-        } else {
-            throw new Error(result.message || 'Failed to load categories');
-        }
+        categorySelect.innerHTML = '<option value="">Memuat kategori...</option>';
+categorySelect.disabled = true;
+
+const { data: categories, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('type', type);
+
+if (!error && categories) {
+    categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        option.dataset.icon = category.icon || '';
+        option.dataset.color = category.color || '';
+        categorySelect.appendChild(option);
+    });
+    console.log(`✅ Loaded ${categories.length} categories for type: ${type}`);
+} else {
+    // Fallback ke kategori statis jika gagal
+    // ... (kode fallback Anda)
+    alert('⚠️ Gagal memuat kategori dari database. Menggunakan kategori default.');
+}
+categorySelect.disabled = false;
         
     } catch (error) {
         console.error('❌ Error loading categories:', error);
@@ -894,23 +883,39 @@
         });
         
         // Prepare form data
-        const formData = new FormData();
-        formData.append('action', 'create');
-        formData.append('user_id', '1');
-        formData.append('type', typeValue);
-        formData.append('amount', amountValue);
-        formData.append('category_id', categoryValue); // NEW: category ID
-        formData.append('category', categoryName); // LEGACY: category name (keep for backward compatibility)
-        formData.append('description', descriptionValue);
-        formData.append('date', dateValue);
+        //const formData = new FormData();
+        //formData.append('action', 'create');
+        //formData.append('user_id', '1');
+        //formData.append('type', typeValue);
+        //formData.append('amount', amountValue);
+        //formData.append('category_id', categoryValue); // NEW: category ID
+        //formData.append('category', categoryName); // LEGACY: category name (keep for backward compatibility)
+        //formData.append('description', descriptionValue);
+        //formData.append('date', dateValue);
         
-        const response = await fetch('../api/transactions.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        console.log('💾 Save result:', result);
+        const { error } = await supabase.from('transactions').insert([{
+    user_id: currentUser.id,
+    type: typeValue,
+    amount: parseFloat(amountValue),
+    category_id: categoryValue,
+    category: categoryName,
+    description: descriptionValue,
+    date: dateValue
+}]);
+
+if (!error) {
+    // Close modal
+    document.getElementById('transactionModal').classList.add('hidden');
+    // Reset form
+    document.getElementById('transactionForm').reset();
+    document.getElementById('transactionType').value = '';
+    // Reload dashboard data
+    await loadDashboardData();
+    alert('✅ Transaksi berhasil disimpan!');
+} else {
+    throw new Error(error.message || 'Gagal menyimpan transaksi');
+}
+
         
         if (result.success) {
             // Close modal
