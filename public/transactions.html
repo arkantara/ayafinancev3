@@ -569,76 +569,45 @@ const supabase = window.supabase.createClient(
     let html = '';
     
     paginatedTransactions.forEach((transaction, index) => {
-        const username = transaction.username || 'Unknown User';
-        const rowNumber = startIndex + index + 1;
-        
-        html += `
-            <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
-                <td class="py-3 md:py-4 px-2 md:px-4 text-center font-medium text-gray-600 text-xs md:text-sm">${rowNumber}</td>
-                <td class="py-3 md:py-4 px-2 md:px-4 text-gray-800 text-xs md:text-sm">${transaction.date}</td>
-                <td class="py-3 md:py-4 px-2 md:px-4">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        transaction.type === 'income' 
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                            : 'bg-rose-100 text-rose-800 border border-rose-200'
-                    }">
-                        <i class="fas ${transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down'} mr-1"></i>
-                        <span class="hidden sm:inline">${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</span>
-                        <span class="sm:hidden">${transaction.type === 'income' ? 'IN' : 'OUT'}</span>
+    const username = transaction.username || 'Unknown User';
+    const rowNumber = startIndex + index + 1;
+    html += `
+        <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-3 md:px-6 py-3 text-left text-sm text-gray-700">${rowNumber}</td>
+            <td class="px-3 md:px-6 py-3 text-left text-sm text-gray-700">${transaction.date}</td>
+            <td class="px-3 md:px-6 py-3 text-left text-sm">
+                <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold ${transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                    ${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                </span>
+            </td>
+            <td class="px-3 md:px-6 py-3 text-left text-sm text-gray-700 mobile-hide">${transaction.category}</td>
+            <td class="px-3 md:px-6 py-3 text-left text-sm text-gray-700">${transaction.description || '-'}</td>
+            <td class="px-3 md:px-6 py-3 text-right text-sm text-gray-700">${formatCurrency(transaction.amount)}</td>
+            <td class="px-3 md:px-6 py-3 text-left text-sm text-gray-700 mobile-hide">${username}</td>
+            <td class="py-3 md:py-4 px-2 md:px-4">
+                <div class="flex items-center justify-center gap-2 mobile-actions">
+                    <button onclick="editTransaction('${transaction.id}')"
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow hover:from-blue-600 hover:to-cyan-600 hover:scale-105 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        title="Edit Transaksi">
+                        <i class="fas fa-pen-to-square mr-1"></i>
+                        <span class="hidden md:inline">Edit</span>
+                    </button>
+                    <button onclick="deleteTransaction('${transaction.id}')"
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white shadow hover:from-red-600 hover:to-pink-600 hover:scale-105 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
+                        title="Hapus Transaksi">
+                        <i class="fas fa-trash-alt mr-1"></i>
+                        <span class="hidden md:inline">Hapus</span>
+                    </button>
+                </div>
+                <div class="md:hidden text-center mt-1">
+                    <span class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-700">
+                        <i class="fas fa-user mr-1"></i>${username.substring(0, 6)}
                     </span>
-                </td>
-                <td class="py-3 md:py-4 px-2 md:px-4 mobile-hide">
-                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                        ${transaction.category}
-                    </span>
-                </td>
-                <td class="py-3 md:py-4 px-2 md:px-4 text-gray-700 text-xs md:text-sm">
-                    <div class="truncate max-w-24 md:max-w-32" title="${transaction.description}">${transaction.description}</div>
-                    <!-- Show category on mobile under description -->
-                    <div class="md:hidden text-xs text-gray-500 mt-1">
-                        <span class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
-                            ${transaction.category}
-                        </span>
-                    </div>
-                </td>
-                <td class="py-3 md:py-4 px-2 md:px-4 font-semibold text-right text-xs md:text-sm ${
-                    transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-                }">
-                    ${formatCurrency(parseFloat(transaction.amount))}
-                </td>
-                <td class="py-3 md:py-4 px-2 md:px-4 mobile-hide">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        <i class="fas fa-user mr-1"></i><span class="hidden lg:inline">${username}</span><span class="lg:hidden">${username.substring(0, 3)}</span>
-                    </span>
-                </td>
-                <td class="py-3 md:py-4 px-2 md:px-4">
-                    <div class="flex items-center justify-center space-x-1 mobile-actions">
-                        <!-- Mobile-optimized Edit Button -->
-                        <button onclick="editTransaction(${transaction.id})" 
-                                class="group relative inline-flex items-center justify-center p-1.5 md:p-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-md md:rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 touch-btn mobile-btn"
-                                title="Edit Transaksi">
-                            <i class="fas fa-edit text-xs md:text-sm"></i>
-                            <span class="hidden md:inline ml-1">Edit</span>
-                        </button>
-                        
-                        <!-- Mobile-optimized Delete Button -->
-                        <button onclick="deleteTransaction(${transaction.id})" 
-                                class="group relative inline-flex items-center justify-center p-1.5 md:p-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 rounded-md md:rounded-lg hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 touch-btn mobile-btn"
-                                title="Hapus Transaksi">
-                            <i class="fas fa-trash-alt text-xs md:text-sm"></i>
-                            <span class="hidden md:inline ml-1">Hapus</span>
-                        </button>
-                    </div>
-                    <!-- Show user on mobile under actions -->
-                    <div class="md:hidden text-center mt-1">
-                        <span class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-700">
-                            <i class="fas fa-user mr-1"></i>${username.substring(0, 6)}
-                        </span>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
+                </div>
+            </td>
+        </tr>
+    `;
+});
     
     tableBody.innerHTML = html;
     
@@ -863,7 +832,7 @@ function resetFilters() {
     const { error } = await supabase
         .from('transactions')
         .delete()
-        .eq('id', id);
+        .eq('id', id); // id tetap string
     if (error) {
         alert('Gagal menghapus transaksi: ' + error.message);
         return;
@@ -1079,26 +1048,19 @@ async function handleUpdateTransaction(id, updateData) {
         
         // Edit transaction
         function editTransaction(id) {
-            console.log('🔧 Editing transaction ID:', id);
-            
-            const transactions = window.allTransactions || allTransactions;
-            
-            if (!transactions || transactions.length === 0) {
-                alert('❌ Data transaksi belum dimuat');
-                return;
-            }
-            
-            const transaction = transactions.find(t => {
-                const transactionId = parseInt(t.id);
-                const targetId = parseInt(id);
-                return transactionId === targetId;
-            });
-            
-            if (!transaction) {
-                console.log('❌ Transaction not found with ID:', id);
-                alert('❌ Transaksi tidak ditemukan');
-                return;
-            }
+    console.log('🔧 Editing transaction ID:', id);
+
+    const transactions = window.allTransactions || allTransactions;
+    if (!transactions || transactions.length === 0) {
+        alert('❌ Data transaksi belum dimuat');
+        return;
+    }
+
+    const transaction = transactions.find(t => t.id === id);
+    if (!transaction) {
+        alert('❌ Transaksi tidak ditemukan');
+        return;
+    }
             
             console.log('📝 Transaction data found:', transaction);
             
@@ -1162,9 +1124,9 @@ async function handleUpdateTransaction(id, updateData) {
             }
             
             window.editMode = {
-                isEditing: true,
-                transactionId: parseInt(id)
-            };
+        isEditing: true,
+        transactionId: id // UUID string, bukan parseInt
+    };
             
             const modal = document.getElementById('transactionModal');
             if (modal) {
