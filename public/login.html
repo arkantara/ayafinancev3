@@ -152,16 +152,15 @@
                     showError(error.message || 'Login gagal');
                 } else {
                     showSuccess('Login berhasil! Mengalihkan...');
-                    // Simpan user ke localStorage jika perlu
                     if (data && data.user) {
-    // Pastikan hanya UUID (tanpa tambahan :1)
-    if (data.user.id) {
-        data.user.id = data.user.id.split(':')[0];
-    }
-    localStorage.setItem('currentUser', JSON.stringify(data.user));
-}                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1200);
+    // Simpan hanya UUID dan nama/email user
+    const uuid = data.user.id.split(':')[0];
+    const name = data.user.user_metadata?.username || data.user.email;
+    localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 1200);
+}
                 }
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');

@@ -1460,7 +1460,13 @@ function updateActiveQuickButton(activeButton) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM ready, initializing page...');
     
-    currentUser = { id: 'UUID_USER_ASLI', name: 'admin' };
+    const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+if (storedUser) {
+    currentUser = JSON.parse(storedUser);
+} else {
+    // Redirect ke login jika belum login
+    window.location.href = 'login.html';
+}
     console.log('✅ User found:', currentUser.name);
     
     initializeTransactionTypeButtons();
