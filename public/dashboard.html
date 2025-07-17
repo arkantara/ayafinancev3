@@ -939,24 +939,6 @@ if (!error) {
 }
 
         
-        if (result.success) {
-            // Close modal
-            document.getElementById('transactionModal').classList.add('hidden');
-            
-            // Reset form
-            document.getElementById('transactionForm').reset();
-            document.getElementById('transactionType').value = '';
-            
-            // Reload dashboard data
-            await loadDashboardData();
-            
-            // Show success message
-            alert('✅ Transaksi berhasil disimpan!');
-            
-        } else {
-            throw new Error(result.message || 'Gagal menyimpan transaksi');
-        }
-        
     } catch (error) {
         console.error('❌ Form submission error:', error);
         alert('❌ Error: ' + error.message);
