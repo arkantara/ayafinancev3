@@ -842,50 +842,30 @@ function resetFilters() {
 }
         
         // Update categories options
-        function updateCategoriesOptions(type) {
-            console.log('🔄 Updating categories for type:', type);
-            
-            const categorySelect = document.getElementById('transactionCategory');
-            if (!categorySelect) {
-                console.log('❌ Category select not found');
-                return;
-            }
-            
-            categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
-            
-            let categories = [];
-            
-            if (type === 'income') {
-                categories = [
-                    { value: 'salary', text: 'Gaji' },
-                    { value: 'freelance', text: 'Freelance' },
-                    { value: 'investment', text: 'Investasi' },
-                    { value: 'business', text: 'Bisnis' },
-                    { value: 'gift', text: 'Hadiah' },
-                    { value: 'other_income', text: 'Lainnya' }
-                ];
-            } else if (type === 'expense') {
-                categories = [
-                    { value: 'food', text: 'Makanan' },
-                    { value: 'transportation', text: 'Transportasi' },
-                    { value: 'shopping', text: 'Belanja' },
-                    { value: 'bills', text: 'Tagihan' },
-                    { value: 'health', text: 'Kesehatan' },
-                    { value: 'entertainment', text: 'Hiburan' },
-                    { value: 'education', text: 'Pendidikan' },
-                    { value: 'other_expense', text: 'Lainnya' }
-                ];
-            }
-            
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.value;
-                option.textContent = category.text;
-                categorySelect.appendChild(option);
-            });
-            
-            console.log('✅ Categories updated:', categories.length, 'options');
-        }
+        async function updateCategoriesOptions(type) {
+    const categorySelect = document.getElementById('transactionCategory');
+    if (!categorySelect) return;
+
+    categorySelect.innerHTML = '<option value="">Pilih kategori</option>';
+
+    // Ambil kategori dari Supabase
+    const { data: categories, error } = await supabase
+        .from('categories')
+        .select('id, name, type')
+        .eq('type', type);
+
+    if (error) {
+        alert('Gagal memuat kategori');
+        return;
+    }
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id; // id kategori dari database
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
+}
         
         // Initialize transaction type buttons
         function initializeTransactionTypeButtons() {
@@ -953,17 +933,20 @@ function resetFilters() {
 
 document.getElementById('transactionForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const categorySelect = document.getElementById('transactionCategory');
+    const categoryId = categorySelect.value;
+    const categoryText = categorySelect.options[categorySelect.selectedIndex].text;
+
     const formData = {
-    user_id: currentUser.id,
-    type: document.getElementById('transactionType').value,
-    amount: parseFloat(document.getElementById('transactionAmount').value),
-    category_id: parseInt(document.getElementById('transactionCategory').value),
-    category: document.getElementById('transactionCategory').options[
-        document.getElementById('transactionCategory').selectedIndex
-    ].text,
-    description: document.getElementById('transactionDescription').value,
-    date: document.getElementById('transactionDate').value
-};
+        user_id: currentUser.id,
+        type: document.getElementById('transactionType').value,
+        amount: parseFloat(document.getElementById('transactionAmount').value),
+        category_id: categoryId, // Kirim category_id
+        category: categoryText,
+        description: document.getElementById('transactionDescription').value,
+        date: document.getElementById('transactionDate').value
+    };
+
     if (window.editMode && window.editMode.isEditing) {
         await handleUpdateTransaction(window.editMode.transactionId, formData);
         window.editMode = null;
@@ -1096,9 +1079,13 @@ async function handleUpdateTransaction(id, updateData) {
                 }
                 
                 const categorySelect = document.getElementById('transactionCategory');
-                if (categorySelect) {
-                    categorySelect.value = transaction.category;
-                }
+if (categorySelect) {
+    categorySelect.value = transaction.category_id; // Set value ke id kategori
+}
+                const categoryidSelect = document.getElementById('transactionCategory');
+    if (categorySelect) {
+        categorySelect.value = transaction.category_id; // Set value ke id kategori
+    }
                 
                 const descInput = document.getElementById('transactionDescription');
                 if (descInput) {
