@@ -373,11 +373,12 @@ const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supab
     console.log('📦 Loading categories for type:', type || 'all');
     try {
         showLoadingState();
-        let query = supabaseClient.from('categories').select('*').eq('user_id', currentUser.id);
+        let query = supabaseClient.from('categories').select('*');
         if (type) {
             query = query.eq('type', type);
         }
         const { data, error } = await query;
+        console.log('Supabase data:', data, 'Error:', error);
         if (error) throw error;
         categories = data || [];
         displayCategories(type || currentTab);
