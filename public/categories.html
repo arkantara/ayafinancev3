@@ -337,7 +337,7 @@
 
     <script>
 
-const supabase = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
+const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
 
         console.log('🏷️ Categories page loading...');
         
@@ -373,7 +373,7 @@ const supabase = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co
     console.log('📦 Loading categories for type:', type || 'all');
     try {
         showLoadingState();
-        let query = supabase.from('categories').select('*').eq('user_id', currentUser.id);
+        let query = supabaseClient.from('categories').select('*').eq('user_id', currentUser.id);
         if (type) {
             query = query.eq('type', type);
         }
@@ -597,7 +597,7 @@ const supabase = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co
     if (!category) return;
     if (!confirm(`Apakah Anda yakin ingin menghapus kategori "${category.name}"?`)) return;
     try {
-        const { error } = await supabase.from('categories').delete().eq('id', id);
+        const { error } = await supabaseClient.from('categories').delete().eq('id', id);
         if (error) {
             alert('❌ ' + error.message);
         } else {
@@ -626,9 +626,9 @@ const supabase = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co
         };
         let result;
         if (isEditing) {
-            result = await supabase.from('categories').update(categoryData).eq('id', editingId);
+            result = await supabaseClient.from('categories').update(categoryData).eq('id', editingId);
         } else {
-            result = await supabase.from('categories').insert([categoryData]);
+            result = await supabaseClient.from('categories').insert([categoryData]);
         }
         if (result.error) {
             alert('❌ ' + result.error.message);
