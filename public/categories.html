@@ -404,38 +404,28 @@ const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supab
             hideEmptyState();
             
             container.innerHTML = filteredCategories.map(category => `
-                <div class="category-item bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: ${category.color}20;">
-                                <i class="${category.icon}" style="color: ${category.color}; font-size: 1.5rem;"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">${category.name}</h4>
-                                <p class="text-sm text-gray-500">${category.is_default ? 'Default' : 'Custom'}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-2">
-                            ${!category.is_default ? `
-                                <button onclick="editCategory(${category.id})" class="text-blue-600 hover:text-blue-800 p-2">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteCategory(${category.id})" class="text-red-600 hover:text-red-800 p-2">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : `
-                                <span class="text-gray-400 text-sm">Tidak dapat diedit</span>
-                            `}
-                        </div>
-                    </div>
-                    
-                    <div class="text-xs text-gray-500">
-                        <i class="fas fa-calendar mr-1"></i>
-                        Dibuat: ${new Date(category.created_at).toLocaleDateString('id-ID')}
-                    </div>
-                </div>
-            `).join('');
+    <div class="category-item flex items-center p-4 rounded-lg shadow bg-white">
+        <div class="w-10 h-10 flex items-center justify-center rounded-full mr-3" style="background:${category.color}">
+            <i class="${category.icon} text-xl text-white"></i>
+        </div>
+        <div class="flex-1">
+            <div class="font-semibold text-gray-800">${category.name}</div>
+            <div class="text-xs text-gray-500">${category.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</div>
+        </div>
+        <div class="flex space-x-2">
+            ${!category.is_default ? `
+                <button onclick="editCategory('${category.id}')" class="text-blue-600 hover:text-blue-800 p-2">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteCategory('${category.id}')" class="text-red-600 hover:text-red-800 p-2">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ` : `
+                <span class="text-gray-400 text-sm">Tidak dapat diedit</span>
+            `}
+        </div>
+    </div>
+`).join('');
         }
         
         // Show/hide states
