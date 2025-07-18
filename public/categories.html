@@ -620,12 +620,12 @@ const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supab
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
         const categoryData = {
-            user_id: currentUser.id,
-            name: document.getElementById('categoryName').value.trim(),
-            type: document.getElementById('categoryType').value,
-            icon: document.getElementById('categoryIcon').value,
-            color: document.getElementById('categoryColor').value
-        };
+    user_id: currentUser.id,
+    name: document.getElementById('categoryName').value.trim(),
+    type: document.getElementById('categoryType').value,
+    icon: document.getElementById('categoryIcon').value || 'fas fa-circle',
+    color: document.getElementById('categoryColor').value || '#3B82F6'
+};
         let result;
         if (isEditing) {
             result = await supabaseClient.from('categories').update(categoryData).eq('id', editingId);
