@@ -619,6 +619,7 @@ const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supab
     try {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+        
         const categoryData = {
     user_id: currentUser.id,
     name: document.getElementById('categoryName').value.trim(),
@@ -626,12 +627,13 @@ const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supab
     icon: document.getElementById('categoryIcon').value || 'fas fa-circle',
     color: document.getElementById('categoryColor').value || '#3B82F6'
 };
-        let result;
-        if (isEditing) {
-            result = await supabaseClient.from('categories').update(categoryData).eq('id', editingId);
-        } else {
-            result = await supabaseClient.from('categories').insert([categoryData]);
-        }
+// Jangan kirim id dan created_at!
+let result;
+if (isEditing) {
+    result = await supabaseClient.from('categories').update(categoryData).eq('id', editingId);
+} else {
+    result = await supabaseClient.from('categories').insert([categoryData]);
+}
         if (result.error) {
             alert('❌ ' + result.error.message);
         } else {
