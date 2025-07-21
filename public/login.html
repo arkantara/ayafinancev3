@@ -61,7 +61,12 @@
                 <i id="spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
             </button>
         </form>
-
+        <div id="loginSuccessModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; padding:2rem; border-radius:1rem; text-align:center;">
+              <p style="font-size:1.2rem; margin-bottom:1rem;">Login berhasil! loveyou aya</p>
+              <button id="loveYouBtn" style="background:#3b82f6; color:#fff; padding:0.5rem 1.5rem; border:none; border-radius:0.5rem; font-size:1rem;">i love you to</button>
+            </div>
+          </div>
         <!-- Links 
         <div class="mt-6 text-center space-y-2">
             <p class="text-sm text-gray-600">
@@ -156,13 +161,15 @@
                 } else {
                     showSuccess('Login berhasil! loveyou aya');
                     if (data && data.user) {
-    // Simpan hanya UUID dan nama/email user
     const uuid = data.user.id.split(':')[0];
     const name = data.user.user_metadata?.username || data.user.email;
     localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
-    setTimeout(() => {
+
+    // Show modal
+    document.getElementById('loginSuccessModal').style.display = 'flex';
+    document.getElementById('loveYouBtn').onclick = function() {
         window.location.href = 'dashboard.html';
-    }, 1200);
+    };
 }
                 }
             } catch (err) {
