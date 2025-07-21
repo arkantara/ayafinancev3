@@ -1155,38 +1155,31 @@ if (categorySelect) {
 }
         
         // Populate category filter
-        function populateCategoryFilter() {
-            const categoryFilter = document.getElementById('categoryFilter');
-            if (!categoryFilter) return;
-            
-            categoryFilter.innerHTML = '<option value="">Semua Kategori</option>';
-            
-            const allCategories = [
-                { value: 'salary', text: 'Gaji' },
-                { value: 'freelance', text: 'Freelance' },
-                { value: 'investment', text: 'Investasi' },
-                { value: 'business', text: 'Bisnis' },
-                { value: 'gift', text: 'Hadiah' },
-                { value: 'other_income', text: 'Pemasukan Lainnya' },
-                { value: 'food', text: 'Makanan' },
-                { value: 'transportation', text: 'Transportasi' },
-                { value: 'shopping', text: 'Belanja' },
-                { value: 'bills', text: 'Tagihan' },
-                { value: 'health', text: 'Kesehatan' },
-                { value: 'entertainment', text: 'Hiburan' },
-                { value: 'education', text: 'Pendidikan' },
-                { value: 'other_expense', text: 'Pengeluaran Lainnya' }
-            ];
-            
-            allCategories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.value;
-                option.textContent = category.text;
-                categoryFilter.appendChild(option);
-            });
-            
-            console.log('✅ Category filter populated');
-        }
+        async function populateCategoryFilter() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (!categoryFilter) return;
+
+    categoryFilter.innerHTML = '<option value="">Semua Kategori</option>';
+
+    // Ambil kategori dari Supabase
+    const { data: categories, error } = await supabase
+        .from('categories')
+        .select('id, name');
+
+    if (error) {
+        alert('Gagal memuat kategori');
+        return;
+    }
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        categoryFilter.appendChild(option);
+    });
+
+    console.log('✅ Category filter populated from database');
+}
         
         // Set default date range
         function setDefaultDateRange() {
