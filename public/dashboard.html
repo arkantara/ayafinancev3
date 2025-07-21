@@ -967,10 +967,14 @@ if (!error) {
             }
             
             // Update mobile welcome user
-            const mobileWelcomeElement = document.getElementById('mobileWelcomeUser');
-            if (mobileWelcomeElement) {
-                mobileWelcomeElement.textContent = currentUser.full_name || currentUser.username || 'Admin';
-            }
+            const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
+if (mobileWelcomeUser) {
+    mobileWelcomeUser.textContent = user.username || user.name || 'User';
+    const mobileEmail = mobileWelcomeUser.nextElementSibling;
+    if (mobileEmail) {
+        mobileEmail.textContent = user.email || '';
+    }
+}
             
             // Initialize charts
             setTimeout(() => {
@@ -1217,6 +1221,21 @@ if (categoriesBtn) {
         });
         
         console.log('✅ Clean dashboard script loaded');
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const welcomeUser = document.getElementById('welcomeUser');
+        if (welcomeUser) {
+            welcomeUser.textContent = user.username || user.name || 'User';
+        }
+        const emailElement = welcomeUser?.nextElementSibling;
+        if (emailElement) {
+            emailElement.textContent = user.email || '';
+        }
+    }
+});
     </script>
 </body>
 
