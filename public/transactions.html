@@ -1644,9 +1644,13 @@ document.addEventListener('click', function(e) {
     
     // Update desktop welcome user
     const welcomeElement = document.getElementById('welcomeUser');
-    if (welcomeElement) {
-        welcomeElement.textContent = 'Admin';
-    }
+if (welcomeElement) {
+    welcomeElement.textContent = currentUser.username || currentUser.name || currentUser.full_name || 'Admin';
+}
+const emailElement = welcomeElement?.nextElementSibling;
+if (emailElement) {
+    emailElement.textContent = currentUser.email || '';
+}
 
     // Update mobile welcome user (THIS STAYS WHERE IT IS - LINE 1520)
     const mobileWelcomeElement = document.getElementById('mobileWelcomeUser');
