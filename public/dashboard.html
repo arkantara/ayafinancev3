@@ -961,23 +961,23 @@ if (!error) {
             console.log('✅ User logged in:', currentUser);
             
             // Update welcome message
-const welcomeElement = document.getElementById('welcomeUser');
+            const welcomeElement = document.getElementById('welcomeUser');
 if (welcomeElement) {
     welcomeElement.textContent = currentUser.username || currentUser.name || currentUser.full_name || 'Admin';
-    const emailElement = welcomeElement.nextElementSibling;
-    if (emailElement) {
-        emailElement.textContent = currentUser.email || '';
-    }
+}
+const emailElement = welcomeElement?.nextElementSibling;
+if (emailElement) {
+    emailElement.textContent = currentUser.email || '';
 }
 
 // Update mobile welcome user
 const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
     mobileWelcomeUser.textContent = currentUser.username || currentUser.name || currentUser.full_name || 'User';
-    const mobileEmail = mobileWelcomeUser.nextElementSibling;
-    if (mobileEmail) {
-        mobileEmail.textContent = currentUser.email || '';
-    }
+}
+const mobileEmail = mobileWelcomeUser?.nextElementSibling;
+if (mobileEmail) {
+    mobileEmail.textContent = currentUser.email || '';
 }
             
             // Initialize charts
