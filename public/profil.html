@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Saya - ayaFinance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-lg mx-auto mt-10 bg-white p-8 rounded-xl shadow">
+        <h2 class="text-2xl font-bold mb-6">Profil Saya</h2>
+        <form id="profileForm" class="space-y-4">
+            <div class="flex flex-col items-center mb-4">
+                <img id="profilePhoto" src="default-avatar.png" class="w-24 h-24 rounded-full object-cover mb-2" alt="Foto Profil">
+                <input type="file" id="photoInput" accept="image/*" class="hidden">
+                <button type="button" id="uploadBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Upload Foto</button>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Username</label>
+                <input type="text" id="username" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Email</label>
+                <input type="email" id="email" class="w-full border px-3 py-2 rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Full Name</label>
+                <input type="text" id="fullname" class="w-full border px-3 py-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Password</label>
+                <input type="password" id="password" class="w-full border px-3 py-2 rounded" placeholder="Kosongkan jika tidak ingin mengubah">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded font-semibold">Simpan Perubahan</button>
+        </form>
+    </div>
+
+    <script>
+    const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
+    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    async function loadProfile() {
+        const { data, error } = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
+        if (data) {
+            document.getElementById('username').value = data.username || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('fullname').value = data.fullname || '';
+            document.getElementById('profilePhoto').src = data.photo_url || 'default-avatar.png';
+        }
+    }
+
+    document.getElementById('uploadBtn').onclick = () => {
+        document.getElementById('photoInput').click();
+    };
+
+    document.getElementById('photoInput').onchange = async function() {
+        const file = this.files[0];
+        if (!file) return;
+        const filePath = `profile/${currentUser.id}/${Date.now()}_${file.name}`;
+        const { data, error } = await supabaseClient.storage.from('profile-photos').upload(filePath, file, { upsert: true });
+        if (data) {
+            const { publicUrl } = supabaseClient.storage.from('profile-photos').getPublicUrl(filePath).data;
+            document.getElementById('profilePhoto').src = publicUrl;
+            // Update photo_url in users table
+            await supabaseClient.from('users').update({ photo_url: publicUrl }).eq('id', currentUser.id);
+        } else {
+            alert('Upload gagal');
+        }
+    };
+
+    document.getElementById('profileForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const updates = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            fullname: document.getElementById('fullname').value
+        };
+        const password = document.getElementById('password').value;
+        if (password) updates.password = password;
+        const { error } = await supabaseClient.from('users').update(updates).eq('id', currentUser.id);
+        if (error) {
+            alert('❌ ' + error.message);
+        } else {
+            alert('✅ Profil berhasil diupdate!');
+            loadProfile();
+        }
+    };
+
+    loadProfile();
+    </script>
+</body>
+</html>
