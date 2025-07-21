@@ -969,10 +969,10 @@ if (!error) {
             // Update mobile welcome user
             const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
-    mobileWelcomeUser.textContent = user.username || user.name || 'User';
+    mobileWelcomeUser.textContent = currentUser.username || currentUser.name || 'User';
     const mobileEmail = mobileWelcomeUser.nextElementSibling;
     if (mobileEmail) {
-        mobileEmail.textContent = user.email || '';
+        mobileEmail.textContent = currentUser.email || '';
     }
 }
             
