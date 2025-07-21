@@ -46,9 +46,12 @@
                     <input 
                         type="password" 
                         id="loginPassword" 
-                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out" 
+                        class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out" 
                         placeholder="Masukkan password Anda"
                         required>
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 focus:outline-none">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
                 </div>
             </div>
 
@@ -151,7 +154,7 @@
                 if (error) {
                     showError(error.message || 'Login gagal');
                 } else {
-                    showSuccess('Login berhasil! Mengalihkan...');
+                    showSuccess('Login berhasil! loveyou aya');
                     if (data && data.user) {
     // Simpan hanya UUID dan nama/email user
     const uuid = data.user.id.split(':')[0];
@@ -184,6 +187,24 @@
             // Focus on first input
             const loginEmail = document.getElementById('loginEmail');
             if (loginEmail) loginEmail.focus();
+
+            // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const loginPassword = document.getElementById('loginPassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (togglePassword && loginPassword && eyeIcon) {
+        togglePassword.addEventListener('click', function() {
+            if (loginPassword.type === 'password') {
+                loginPassword.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                loginPassword.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+    }
         });
     </script>
 </body>
