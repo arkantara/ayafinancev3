@@ -980,7 +980,19 @@ if (!error) {
             // Setup ALL event handlers
             setTimeout(() => {
                 console.log('🔍 Setting up all event handlers...');
-                
+             
+                // Format ribuan otomatis pada input jumlah transaksi
+    const amountInput = document.getElementById('amount');
+    if (amountInput) {
+        amountInput.addEventListener('input', function(e) {
+            // Ambil hanya angka
+            let value = this.value.replace(/\D/g, '');
+            // Format ribuan
+            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            this.value = formatted;
+        });
+    }
+
                 // Add Transaction Button
                 const addTransactionBtn = document.getElementById('addTransactionBtn');
                 if (addTransactionBtn) {
