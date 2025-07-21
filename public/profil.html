@@ -46,7 +46,7 @@
         if (data) {
             document.getElementById('username').value = data.username || '';
             document.getElementById('email').value = data.email || '';
-            document.getElementById('fullname').value = data.fullname || '';
+            document.getElementById('fullname').value = data.full_name || '';
             document.getElementById('profilePhoto').src = data.photo_url || 'https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff';
         }
     }
@@ -104,7 +104,9 @@ document.getElementById('profileForm').onsubmit = async function(e) {
     }
 };
 
+document.addEventListener('DOMContentLoaded', function() {
     loadProfile();
+});
     </script>
 </body>
 </html>
