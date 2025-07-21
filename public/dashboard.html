@@ -1222,20 +1222,7 @@ if (categoriesBtn) {
         
         console.log('✅ Clean dashboard script loaded');
 
-        document.addEventListener('DOMContentLoaded', function() {
-    const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-    if (storedUser) {
-        const user = JSON.parse(storedUser);
-        const welcomeUser = document.getElementById('welcomeUser');
-        if (welcomeUser) {
-            welcomeUser.textContent = user.username || user.name || 'User';
-        }
-        const emailElement = welcomeUser?.nextElementSibling;
-        if (emailElement) {
-            emailElement.textContent = user.email || '';
-        }
-    }
-});
+        
     </script>
 </body>
 
