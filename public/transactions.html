@@ -106,25 +106,20 @@
         }
 
         @media (min-width: 769px) {
-  .filter-section {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 2rem;
-    padding: 0; /* padding di .mobile-card */
-  }
-  .mobile-card {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 2rem !important;
-    margin-bottom: 2rem !important;
-  }
-  .filter-desktop {
-    width: 100%;
-    box-sizing: border-box;
-  }
+  .filter-section,
+  .mobile-card,
+  .filter-desktop,
   .transactions-section {
     width: 100%;
     box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .mobile-card {
+    padding: 2rem !important;
+    margin-bottom: 2rem !important;
   }
 }
         
@@ -372,7 +367,6 @@
             <div id="filterStats" class="text-sm text-gray-600 mt-2"></div>
         </div>
     </div>
-</div>
        
         <!-- Transactions Table -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden transactions-section">
@@ -426,6 +420,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- Transaction Modal -->
     <div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
