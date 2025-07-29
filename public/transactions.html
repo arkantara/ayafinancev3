@@ -109,6 +109,13 @@
   .filter-desktop {
     display: block !important;
   }
+  .mobile-card {
+    padding: 2rem !important; /* Tambah padding agar lebih rapi di desktop */
+  }
+  .filter-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 2rem !important;
+  }
 }
         
         @media (max-width: 480px) {
@@ -291,7 +298,7 @@
             </button>
           </div>
           <div id="filterContent" class="hidden md:block filter-desktop">
-        </div>
+        
 
         <!-- Filter Content -->
             <!-- Search Input -->
@@ -355,7 +362,7 @@
             <div id="filterStats" class="text-sm text-gray-600 mt-2"></div>
         </div>
     </div>
-
+</div>
        
         <!-- Transactions Table -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
