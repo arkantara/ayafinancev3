@@ -100,6 +100,12 @@
             .filter-desktop {
                 display: none !important;
             }
+            #filterContent.filter-desktop {
+        display: none !important;
+      }
+      #filterContent:not(.hidden) {
+        display: block !important;
+      }
         }
         
         @media (max-width: 480px) {
@@ -273,15 +279,17 @@
     <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 mobile-card">
         <!-- Mobile Filter Toggle -->
         <div class="md:hidden filter-mobile mb-4">
-            <button id="toggleFilterBtn" class="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-between touch-btn">
-                <span>
-                    <i class="fas fa-filter mr-2"></i>
-                    Filter & Pencarian
-                </span>
-                <i id="filterToggleIcon" class="fas fa-chevron-down transition-transform"></i>
+            <button id="toggleFilterBtn" ...>
+              <span>
+                <i class="fas fa-filter mr-2"></i>
+                Filter & Pencarian
+              </span>
+              <i id="filterToggleIcon" class="fas fa-chevron-down transition-transform"></i>
             </button>
+          </div>
+          <div id="filterContent" class="hidden md:block filter-desktop">
         </div>
-        
+
         <!-- Filter Content -->
         <div id="filterContent" class="hidden md:block filter-desktop">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter & Pencarian Transaksi</h3>
