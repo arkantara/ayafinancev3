@@ -751,45 +751,7 @@ function hideLoadingState() {
                 }
             }
         
-            // Category Chart
-            const ctx2 = document.getElementById('categoryChart');
-            if (ctx2) {
-                console.log('📊 Creating category chart...');
-                
-                // Safe destroy
-                if (window.categoryChart && typeof window.categoryChart.destroy === 'function') {
-                    window.categoryChart.destroy();
-                }
-                
-                try {
-                    window.categoryChart = new Chart(ctx2, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Makanan', 'Transport', 'Hiburan', 'Belanja', 'Lainnya'],
-                            datasets: [{
-                                data: [35, 20, 15, 20, 10],
-                                backgroundColor: [
-                                    'rgb(59, 130, 246)',
-                                    'rgb(34, 197, 94)',
-                                    'rgb(239, 68, 68)',
-                                    'rgb(168, 85, 247)',
-                                    'rgb(249, 115, 22)'
-                                ],
-                                borderWidth: 0,
-                                hoverOffset: 4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } }
-                        }
-                    });
-                    console.log('✅ Category chart initialized');
-                } catch (error) {
-                    console.error('❌ Error creating category chart:', error);
-                }
-            }
+            
         }
         
         // Transaction type selection
