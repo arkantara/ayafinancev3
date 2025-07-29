@@ -1524,11 +1524,14 @@ document.addEventListener('click', function(e) {
 const filterContent = document.getElementById('filterContent');
 const filterToggleIcon = document.getElementById('filterToggleIcon');
 
-if (toggleFilterBtn && filterContent) {
+if (toggleFilterBtn && filterContent && filterToggleIcon) {
     toggleFilterBtn.addEventListener('click', function() {
+        console.log('Toggle filter clicked');
         filterContent.classList.toggle('hidden');
         filterToggleIcon.classList.toggle('rotate-180');
     });
+} else {
+    console.log('ToggleFilterBtn, FilterContent, or FilterToggleIcon not found');
 }
     
 // ADD PROFILE DROPDOWN HANDLERS HERE (INSERT AT LINE 1519):
