@@ -957,11 +957,16 @@ document.getElementById('transactionForm').addEventListener('submit', async func
     const categoryId = categorySelect.value;
     const categoryText = categorySelect.options[categorySelect.selectedIndex].text;
 
+    // Ambil nilai dan hilangkan semua titik
+    let rawAmount = document.getElementById('transactionAmount').value;
+    let cleanAmount = rawAmount.replace(/\./g, ''); // Hilangkan semua titik
+    let amount = parseFloat(cleanAmount);
+
     const formData = {
         user_id: currentUser.id,
         type: document.getElementById('transactionType').value,
-        amount: parseFloat(document.getElementById('transactionAmount').value),
-        category_id: categoryId, // Kirim category_id
+        amount: amount, // Sudah bersih dari titik
+        category_id: categoryId,
         category: categoryText,
         description: document.getElementById('transactionDescription').value,
         date: document.getElementById('transactionDate').value
