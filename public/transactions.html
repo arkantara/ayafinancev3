@@ -100,13 +100,16 @@
             .filter-desktop {
                 display: none !important;
             }
-            #filterContent.filter-desktop {
-        display: none !important;
-      }
       #filterContent:not(.hidden) {
         display: block !important;
       }
         }
+
+        @media (min-width: 769px) {
+  .filter-desktop {
+    display: block !important;
+  }
+}
         
         @media (max-width: 480px) {
             /* Extra small devices */
