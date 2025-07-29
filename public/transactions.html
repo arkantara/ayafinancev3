@@ -106,19 +106,21 @@
         }
 
         @media (min-width: 769px) {
-  .filter-desktop {
-    display: block !important;
-    width: 100%; /* pastikan lebar penuh */
+  .filter-section {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
+    padding: 0; /* padding di .mobile-card */
   }
   .mobile-card {
-    padding: 2rem !important;
-    margin-bottom: 2rem !important; /* beri jarak bawah */
-    width: 100%; /* pastikan lebar penuh */
+    width: 100%;
     box-sizing: border-box;
+    padding: 2rem !important;
+    margin-bottom: 2rem !important;
   }
-  .filter-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 2rem !important;
+  .filter-desktop {
+    width: 100%;
+    box-sizing: border-box;
   }
   .transactions-section {
     width: 100%;
@@ -294,7 +296,7 @@
         </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 mobile-card filter-section">
+    <div class="bg-white rounded-lg shadow mobile-card filter-section">
         <!-- Mobile Filter Toggle -->
         <div class="md:hidden filter-mobile mb-4">
             <button id="toggleFilterBtn" ...>
