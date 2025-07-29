@@ -1521,20 +1521,13 @@ document.addEventListener('click', function(e) {
     
     // Mobile filter toggle
     const toggleFilterBtn = document.getElementById('toggleFilterBtn');
-    const filterContent = document.getElementById('filterContent');
-    const filterToggleIcon = document.getElementById('filterToggleIcon');
-    
-    if (toggleFilterBtn && filterContent) {
+const filterContent = document.getElementById('filterContent');
+const filterToggleIcon = document.getElementById('filterToggleIcon');
+
+if (toggleFilterBtn && filterContent) {
     toggleFilterBtn.addEventListener('click', function() {
-        if (filterContent.style.display === 'none' || filterContent.classList.contains('hidden')) {
-            filterContent.style.display = 'block';
-            filterContent.classList.remove('hidden');
-            filterToggleIcon.classList.add('rotate-180');
-        } else {
-            filterContent.style.display = 'none';
-            filterContent.classList.add('hidden');
-            filterToggleIcon.classList.remove('rotate-180');
-        }
+        filterContent.classList.toggle('hidden');
+        filterToggleIcon.classList.toggle('rotate-180');
     });
 }
     
