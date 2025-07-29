@@ -108,13 +108,21 @@
         @media (min-width: 769px) {
   .filter-desktop {
     display: block !important;
+    width: 100%; /* pastikan lebar penuh */
   }
   .mobile-card {
-    padding: 2rem !important; /* Tambah padding agar lebih rapi di desktop */
+    padding: 2rem !important;
+    margin-bottom: 2rem !important; /* beri jarak bawah */
+    width: 100%; /* pastikan lebar penuh */
+    box-sizing: border-box;
   }
   .filter-grid {
     grid-template-columns: repeat(5, 1fr) !important;
     gap: 2rem !important;
+  }
+  .transactions-section {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
         
@@ -286,7 +294,7 @@
         </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 mobile-card">
+    <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 mobile-card filter-section">
         <!-- Mobile Filter Toggle -->
         <div class="md:hidden filter-mobile mb-4">
             <button id="toggleFilterBtn" ...>
@@ -365,7 +373,7 @@
 </div>
        
         <!-- Transactions Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transactions-section">
             <div class="p-4 md:p-6">
                 <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Daftar Transaksi</h2>
                 
