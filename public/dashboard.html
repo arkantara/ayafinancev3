@@ -1019,8 +1019,7 @@ if (!error) {
             if (!currentUser) return;
             
             // TAMPILKAN FOTO PROFIL USER DI BUTTON PROFILE
-const profileAvatar = document.getElementById('profileAvatar');
-if (profileAvatar) {
+            document.querySelectorAll('#profileAvatar').forEach(profileAvatar => {
     if (currentUser.photo_url && currentUser.photo_url.trim() !== '') {
         profileAvatar.innerHTML = `<img src="${currentUser.photo_url}" alt="Foto Profil" class="w-8 h-8 object-cover rounded-full">`;
         profileAvatar.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
@@ -1028,7 +1027,7 @@ if (profileAvatar) {
         profileAvatar.innerHTML = `<i class="fas fa-user text-white text-sm"></i>`;
         profileAvatar.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
     }
-}
+});
 
             console.log('✅ User logged in:', currentUser);
             
