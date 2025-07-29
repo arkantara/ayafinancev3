@@ -940,12 +940,7 @@ document.getElementById('transactionForm').addEventListener('submit', async func
     const formData = {
         user_id: currentUser.id,
         type: document.getElementById('transactionType').value,
-        amount: parseFloat(
-            document
-                .getElementById('transactionAmount')
-                .value
-                .replace(/\./g, '')
-        ),
+        amount: parseFloat(document.getElementById('transactionAmount').value),
         category_id: categoryId, // Kirim category_id
         category: categoryText,
         description: document.getElementById('transactionDescription').value,
@@ -1530,18 +1525,18 @@ document.addEventListener('click', function(e) {
     const filterToggleIcon = document.getElementById('filterToggleIcon');
     
     if (toggleFilterBtn && filterContent) {
-        toggleFilterBtn.addEventListener('click', function() {
-            const isHidden = filterContent.classList.contains('hidden');
-            
-            if (isHidden) {
-                filterContent.classList.remove('hidden');
-                filterToggleIcon.classList.add('rotate-180');
-            } else {
-                filterContent.classList.add('hidden');
-                filterToggleIcon.classList.remove('rotate-180');
-            }
-        });
-    }
+    toggleFilterBtn.addEventListener('click', function() {
+        if (filterContent.style.display === 'none' || filterContent.classList.contains('hidden')) {
+            filterContent.style.display = 'block';
+            filterContent.classList.remove('hidden');
+            filterToggleIcon.classList.add('rotate-180');
+        } else {
+            filterContent.style.display = 'none';
+            filterContent.classList.add('hidden');
+            filterToggleIcon.classList.remove('rotate-180');
+        }
+    });
+}
     
 // ADD PROFILE DROPDOWN HANDLERS HERE (INSERT AT LINE 1519):
     // Profile dropdown handler
