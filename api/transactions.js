@@ -45,7 +45,7 @@ router.put('/update', async (req, res) => {
        WHERE id = $7 AND user_id = $8`,
       [
         type,
-        parseFloat(amount),
+        parseFloat(String(amount).replace(/\./g, '')),
         category_id,
         category,
         description,
