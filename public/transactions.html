@@ -940,7 +940,12 @@ document.getElementById('transactionForm').addEventListener('submit', async func
     const formData = {
         user_id: currentUser.id,
         type: document.getElementById('transactionType').value,
-        amount: parseFloat(document.getElementById('transactionAmount').value),
+        amount: parseFloat(
+            document
+                .getElementById('transactionAmount')
+                .value
+                .replace(/\./g, '')
+        ),
         category_id: categoryId, // Kirim category_id
         category: categoryText,
         description: document.getElementById('transactionDescription').value,
