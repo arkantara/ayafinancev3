@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { Configuration, OpenAIApi } from 'openai';
 
-const supabase = createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
-const openai = new OpenAIApi(new Configuration({ apiKey: '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' }));
-
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }));
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
