@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
 const supabase = createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU2MTE4MSwiZXhwIjoyMDY4MTM3MTgxfQ.lGGDQiSvem3sHEwFYhUQU4nvnM80TIOMdTTaa2LiBBo');
-const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }));
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -19,11 +21,7 @@ export default async function handler(req, res) {
     context = `Data transaksi user: ${JSON.stringify(transactions)}`;
   }
 
-  const prompt = context
-    ? `${context}\nUser: ${message}\nAI:`
-    : `User: ${message}\nAI:`;
-
-  const completion = await openai.createChatCompletion({
+  const completion = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [
       { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
@@ -31,7 +29,6 @@ export default async function handler(req, res) {
     ],
     max_tokens: 500
   });
-
-  const reply = completion.data.choices[0].message.content;
+  const reply = completion.choices[0].message.content;
   res.status(200).json({ reply });
 }
