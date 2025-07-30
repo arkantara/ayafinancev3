@@ -426,6 +426,16 @@
         </div>
     </div>
 
+    <!-- Chat AI Section -->
+<div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border">
+    <div class="p-4 border-b font-bold text-blue-600">Chat AI</div>
+    <div id="chatMessages" class="p-4 h-64 overflow-y-auto text-sm"></div>
+    <form id="chatForm" class="flex border-t">
+        <input id="chatInput" type="text" class="flex-1 px-3 py-2 focus:outline-none" placeholder="Tulis pesan...">
+        <button type="submit" class="px-4 text-blue-600 font-bold">Kirim</button>
+    </form>
+</div>
+
     <!-- LOAD CHART.JS FIRST - BEFORE OUR SCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -751,7 +761,6 @@ function hideLoadingState() {
                 }
             }
         
-            
         }
         
         // Transaction type selection
@@ -1259,7 +1268,38 @@ if (categoriesBtn) {
         
         console.log('✅ Clean dashboard script loaded');
 
-        
+        // Chat AI Frontend
+document.getElementById('chatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendMessage('Anda', msg);
+    input.value = '';
+    appendMessage('AI', '<i class="fas fa-spinner fa-spin"></i>');
+
+    // Kirim ke backend
+    const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, userId: currentUser.id })
+    });
+    const data = await res.json();
+    removeLastMessage(); // Remove spinner
+    appendMessage('AI', data.reply);
+});
+
+function appendMessage(sender, text) {
+    const chat = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+function removeLastMessage() {
+    const chat = document.getElementById('chatMessages');
+    if (chat.lastChild) chat.removeChild(chat.lastChild);
+}
     </script>
 </body>
 
