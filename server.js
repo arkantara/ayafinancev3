@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { createClient } = require('@supabase/supabase-js');
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAI = require('openai');
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,9 +13,9 @@ const supabase = createClient(
 );
 
 // OpenAI setup
-const openai = new OpenAIApi(
-  new Configuration({ apiKey: process.env.OPENAI_API_KEY })
-);
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 
 app.post('/api/chat', async (req, res) => {
   const { message, userId } = req.body;
@@ -34,16 +34,15 @@ app.post('/api/chat', async (req, res) => {
     ? `${context}\nUser: ${message}\nAI:`
     : `User: ${message}\nAI:`;
 
-  const completion = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages: [
-      { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
-      { role: 'user', content: prompt }
-    ],
-    max_tokens: 500
-  });
-
-  const reply = completion.data.choices[0].message.content;
+    const completion = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 500
+      });
+      const reply = completion.choices[0].message.content;
   res.json({ reply });
 });
 
