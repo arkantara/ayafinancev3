@@ -32,53 +32,49 @@ const openai = new OpenAI({
 
 // ─── Chat endpoint ───
 app.post('/api/chat', async (req, res) => {
+  // ─── LOGGING untuk debug ───
+  console.log('🔥 /api/chat called, body =', req.body);
+  console.log('   SUPABASE_URL=', process.env.SUPABASE_URL);
+  console.log('   SUPABASE_KEY present?', !!process.env.SUPABASE_KEY);
+  console.log('   OPENAI_API_KEY present?', !!process.env.OPENAI_API_KEY);
+
   try {
     const { message, userId } = req.body;
-    let context = '';
 
-    // Jika user minta laporan/transaksi, ambil data Supabase
+    // … sisa kode Supabase + OpenAI-mu di sini …
+    let context = '';
     if (/laporan|transaksi/i.test(message)) {
       const { data: transactions, error } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', userId);
-
-      if (error) {
-        console.error('Supabase error:', error);
-      } else {
-        context = `Data transaksi user: ${JSON.stringify(transactions)}`;
-      }
+      if (!error) context = `Data transaksi user: ${JSON.stringify(transactions)}`;
     }
 
-    // Bangun prompt untuk OpenAI
     const prompt = context
       ? `${context}\nUser: ${message}\nAI:`
       : `User: ${message}\nAI:`;
 
-    // Panggil OpenAI Chat Completion
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
-        {
-          role: 'system',
-          content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.'
-        },
+        { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
         { role: 'user', content: prompt }
       ],
       max_tokens: 500
     });
 
-    // Kirim balik jawaban AI
     const reply = completion.choices[0].message.content;
-    res.json({ reply });
+    return res.json({ reply });
+
   } catch (err) {
-    console.error('Error in /api/chat:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('❌ Error in /api/chat:', err);
+    return res.status(500).json({ error: err.message || String(err) });
   }
 });
 
 // ─── Start server pada port dari Railway ───
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
