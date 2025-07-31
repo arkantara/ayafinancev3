@@ -21,14 +21,14 @@ app.use(express.json());
 
 // ─── Supabase client ───
 const supabase = createClient(
-  'https://jjieqhvfadoqkahpqdvl.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU2MTE4MSwiZXhwIjoyMDY4MTM3MTgxfQ.lGGDQiSvem3sHEwFYhUQU4nvnM80TIOMdTTaa2LiBBo'
-);
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY);
 
 // ─── OpenAI client ───
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
+  });
 
 // ─── Chat endpoint ───
 app.post('/api/chat', async (req, res) => {
@@ -36,7 +36,7 @@ app.post('/api/chat', async (req, res) => {
   console.log('🔥 /api/chat called, body =', req.body);
   console.log('   SUPABASE_URL=', process.env.SUPABASE_URL);
   console.log('   SUPABASE_KEY present?', !!process.env.SUPABASE_KEY);
-  console.log('   OPENAI_API_KEY present?', !!process.env.OPENAI_API_KEY);
+  console.log('   GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
 
   try {
     const { message, userId } = req.body;
@@ -56,7 +56,7 @@ app.post('/api/chat', async (req, res) => {
       : `User: ${message}\nAI:`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gemini-2.5-flash',
       messages: [
         { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
         { role: 'user', content: prompt }
