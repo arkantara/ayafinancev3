@@ -8,10 +8,11 @@ const app = express();
 
 const cors = require('cors');
 app.use(cors({
-  origin: 'https://ayafinancev3.vercel.app', // domain frontend Anda
-  methods: ['POST'],
-  credentials: false
+  origin: 'https://ayafinancev3.vercel.app',      // domain tempat frontend-mu deploy
+  methods: ['GET','POST','OPTIONS'],               // tambahkan OPTIONS
+  allowedHeaders: ['Content-Type','Authorization'] // authorize header jika perlu
 }));
+app.options('*', cors());
 
 app.use(bodyParser.json());
 // Supabase setup
@@ -54,4 +55,8 @@ app.post('/api/chat', async (req, res) => {
   res.json({ reply });
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => 
+  console.log(`Server running on port ${PORT}`)
+);
