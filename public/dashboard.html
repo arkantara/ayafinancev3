@@ -1277,7 +1277,7 @@ document.getElementById('chatForm').addEventListener('submit', async function(e)
     appendMessage('AI', '<i class="fas fa-spinner fa-spin"></i>');
 
     // Kirim ke backend
-    const res = await fetch('https://ayafinance-api.up.railway.app/api/chat', {        method: 'POST',
+    const res = await fetch('https://ayafinancev3-production.up.railway.app/api/chat', {        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, userId: currentUser.id })
     });
