@@ -12,7 +12,7 @@ app.use(cors({
   methods: ['GET','POST','OPTIONS'],               // tambahkan OPTIONS
   allowedHeaders: ['Content-Type','Authorization'] // authorize header jika perlu
 }));
-app.options('*', cors());
+//app.options('*', cors());
 
 app.use(bodyParser.json());
 // Supabase setup
