@@ -64,7 +64,7 @@ app.post('/api/chat', async (req, res) => {
       max_tokens: 500
     });
 
-    const reply = completion.choices[0].message.content;
+    const reply = completion.choices[0].message;
     return res.json({ reply });
 
   } catch (err) {
