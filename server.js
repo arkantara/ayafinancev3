@@ -4,8 +4,16 @@ const { createClient } = require('@supabase/supabase-js');
 const OpenAI = require('openai');
 
 const app = express();
-app.use(bodyParser.json());
 
+
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://ayafinancev3.vercel.app', // domain frontend Anda
+  methods: ['POST'],
+  credentials: false
+}));
+
+app.use(bodyParser.json());
 // Supabase setup
 const supabase = createClient(
   'https://jjieqhvfadoqkahpqdvl.supabase.co',
