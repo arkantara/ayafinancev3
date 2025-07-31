@@ -56,7 +56,7 @@ app.post('/api/chat', async (req, res) => {
       : `User: ${message}\nAI:`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4',
       messages: [
         { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
         { role: 'user', content: prompt }
