@@ -55,17 +55,18 @@ app.post('/api/chat', async (req, res) => {
       ? `${context}\nUser: ${message}\nAI:`
       : `User: ${message}\nAI:`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: 'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.' },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 500
-    });
-
-    const reply = completion.choices[0].message;
-    return res.json({ reply });
+      const completion = await openai.chat.completions.create({
+        model: 'gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: '…' },
+          { role: 'user',   content: prompt }
+        ],
+        max_tokens: 500
+      });
+    
+      // pull out the string
+      const reply = completion.choices[0].message.content;
+      return res.json({ reply });
 
   } catch (err) {
     console.error('❌ Error in /api/chat:', err);
