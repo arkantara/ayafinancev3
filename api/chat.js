@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-const supabase = createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU2MTE4MSwiZXhwIjoyMDY4MTM3MTgxfQ.lGGDQiSvem3sHEwFYhUQU4nvnM80TIOMdTTaa2LiBBo');
+const supabase = createClient(process.env.SUPABASE_URL,process.env.SUPABASE_KEY);
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
   });
   export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -27,7 +28,7 @@ const openai = new OpenAI({
       : `User: ${message}\nAI:`;
   
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gemini-2.5-flash',
       messages: [
         {
           role: 'system',
