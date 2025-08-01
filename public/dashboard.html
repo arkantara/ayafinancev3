@@ -427,7 +427,7 @@
     </div>
 
     <!-- Chat AI Section -->
-    <div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border" style="display:none;">
+    <div id="chatAI" class="fixed bottom-20 right-6 bg-white rounded-xl shadow-lg w-80 z-50 border transition-all duration-300 opacity-0 pointer-events-none scale-95" style="display:none;">
         <div class="p-4 border-b font-bold text-blue-600 flex justify-between items-center">
             Chat AI
             <button id="closeChatAI" class="text-gray-400 hover:text-red-500 text-xl font-bold">&times;</button>
@@ -439,7 +439,7 @@
         </form>
     </div>
 
-    <div id="chatAITab" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:60;cursor:pointer;display:block;">
+    <div id="chatAITab" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:40;cursor:pointer;">
         <div class="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg font-bold flex items-center gap-2">
             <i class="fas fa-robot"></i> Chat AI
         </div>
@@ -1303,13 +1303,26 @@ function appendMessage(sender, text) {
     chat.scrollTop = chat.scrollHeight;
 }
 
-// Show Chat AI window saat tab diklik
-document.getElementById('chatAITab').addEventListener('click', function() {
-    document.getElementById('chatAI').style.display = 'block';
+const chatAI = document.getElementById('chatAI');
+const chatAITab = document.getElementById('chatAITab');
+const closeChatAI = document.getElementById('closeChatAI');
+
+// Show Chat AI window dengan animasi
+chatAITab.addEventListener('click', function() {
+    chatAI.style.display = 'block';
+    setTimeout(() => {
+        chatAI.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+        chatAI.classList.add('opacity-100', 'scale-100');
+    }, 10);
 });
 
-document.getElementById('closeChatAI').addEventListener('click', function() {
-    document.getElementById('chatAI').style.display = 'none';
+// Hide Chat AI window dengan animasi
+closeChatAI.addEventListener('click', function() {
+    chatAI.classList.remove('opacity-100', 'scale-100');
+    chatAI.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+    setTimeout(() => {
+        chatAI.style.display = 'none';
+    }, 300); // sesuai duration-300
 });
 
 function removeLastMessage() {
