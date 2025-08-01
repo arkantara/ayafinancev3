@@ -427,7 +427,7 @@
     </div>
 
     <!-- Chat AI Section -->
-    <div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border">
+    <div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border" style="display:none;">
         <div class="p-4 border-b font-bold text-blue-600 flex justify-between items-center">
             Chat AI
             <button id="closeChatAI" class="text-gray-400 hover:text-red-500 text-xl font-bold">&times;</button>
@@ -437,6 +437,12 @@
             <input id="chatInput" type="text" class="flex-1 px-3 py-2 focus:outline-none" placeholder="Tulis pesan...">
             <button type="submit" class="px-4 text-blue-600 font-bold">Kirim</button>
         </form>
+    </div>
+
+    <div id="chatAITab" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:60;cursor:pointer;display:block;">
+        <div class="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg font-bold flex items-center gap-2">
+            <i class="fas fa-robot"></i> Chat AI
+        </div>
     </div>
 
     <!-- LOAD CHART.JS FIRST - BEFORE OUR SCRIPT -->
@@ -1296,6 +1302,11 @@ function appendMessage(sender, text) {
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 }
+
+// Show Chat AI window saat tab diklik
+document.getElementById('chatAITab').addEventListener('click', function() {
+    document.getElementById('chatAI').style.display = 'block';
+});
 
 document.getElementById('closeChatAI').addEventListener('click', function() {
     document.getElementById('chatAI').style.display = 'none';
