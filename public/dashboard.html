@@ -427,14 +427,17 @@
     </div>
 
     <!-- Chat AI Section -->
-<div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border">
-    <div class="p-4 border-b font-bold text-blue-600">Chat AI</div>
-    <div id="chatMessages" class="p-4 h-64 overflow-y-auto text-sm"></div>
-    <form id="chatForm" class="flex border-t">
-        <input id="chatInput" type="text" class="flex-1 px-3 py-2 focus:outline-none" placeholder="Tulis pesan...">
-        <button type="submit" class="px-4 text-blue-600 font-bold">Kirim</button>
-    </form>
-</div>
+    <div id="chatAI" class="fixed bottom-4 right-4 bg-white rounded-xl shadow-lg w-80 z-50 border">
+        <div class="p-4 border-b font-bold text-blue-600 flex justify-between items-center">
+            Chat AI
+            <button id="closeChatAI" class="text-gray-400 hover:text-red-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="chatMessages" class="p-4 h-64 overflow-y-auto text-sm"></div>
+        <form id="chatForm" class="flex border-t">
+            <input id="chatInput" type="text" class="flex-1 px-3 py-2 focus:outline-none" placeholder="Tulis pesan...">
+            <button type="submit" class="px-4 text-blue-600 font-bold">Kirim</button>
+        </form>
+    </div>
 
     <!-- LOAD CHART.JS FIRST - BEFORE OUR SCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1293,6 +1296,11 @@ function appendMessage(sender, text) {
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 }
+
+document.getElementById('closeChatAI').addEventListener('click', function() {
+    document.getElementById('chatAI').style.display = 'none';
+});
+
 function removeLastMessage() {
     const chat = document.getElementById('chatMessages');
     if (chat.lastChild) chat.removeChild(chat.lastChild);
