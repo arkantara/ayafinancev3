@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 const supabase = createClient(process.env.SUPABASE_URL,process.env.SUPABASE_KEY);
 const openai = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: 'AIzaSyCGwKUderqu6J_9JKdQ-7ILPokFJ7apsPo',
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
   });
   export default async function handler(req, res) {
@@ -44,3 +44,4 @@ const openai = new OpenAI({
     const reply = completion.choices[0].message.content;
     res.status(200).json({ reply });
   }
+
