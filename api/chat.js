@@ -27,21 +27,18 @@ const openai = new OpenAI({
       ? `${context}\nUser: ${message}\nAI:`
       : `User: ${message}\nAI:`;
   
-    const completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash',
-      messages: [
+    const response = await openai.chat.completions.create({
+    model: "gemini-2.0-flash",
+    messages: [
+        { role: "system", content: "You are a helpful assistant." },
         {
-          role: 'system',
-          content:
-            'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.'
+            role: "user",
+            content: "Explain to me how AI works",
         },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 500
-    });
-  
-    // ────── Kirim balik hasil ke frontend ──────
-    const reply = completion.choices[0].message.content;
-    res.status(200).json({ reply });
+    ],
+});
+
+console.log(response.choices[0].message);
   }
+
 
