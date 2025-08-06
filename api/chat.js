@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 const supabase = createClient('https://jjieqhvfadoqkahpqdvl.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU2MTE4MSwiZXhwIjoyMDY4MTM3MTgxfQ.lGGDQiSvem3sHEwFYhUQU4nvnM80TIOMdTTaa2LiBBo');
 const openai = new OpenAI({
-  apiKey: 'AIzaSyCGwKUderqu6J_9JKdQ-7ILPokFJ7apsPo',
+  apiKey: process.env.OPENAI_API_KEY,
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
   });
   export default async function handler(req, res) {
@@ -44,3 +44,4 @@ const openai = new OpenAI({
     const reply = completion.choices[0].message.content;
     res.status(200).json({ reply });
   }
+
