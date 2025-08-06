@@ -27,23 +27,20 @@ const openai = new OpenAI({
       ? `${context}\nUser: ${message}\nAI:`
       : `User: ${message}\nAI:`;
   
-      const openai = new OpenAI({
-        apiKey: "GEMINI_API_KEY",
-        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
-    });
-    
-    const response = await openai.chat.completions.create({
-    model: "gemini-2.5-flash",
-    reasoning_effort: "low",
-    messages: [
-        { role: "system", content: "You are a helpful assistant." },
+    const completion = await openai.chat.completions.create({
+      model: 'gemini-2.5-flash',
+      messages: [
         {
-            role: "user",
-            content: "Explain to me how AI works",
+          role: 'system',
+          content:
+            'Kamu adalah asisten keuangan aplikasi ayaFinance. Jawab sesuai data jika ada.'
         },
-    ],
-});
-
-console.log(response.choices[0].message);
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 500
+    });
+  
+    // ────── Kirim balik hasil ke frontend ──────
+    const reply = completion.choices[0].message.content;
+    res.status(200).json({ reply });
   }
-
