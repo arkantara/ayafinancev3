@@ -1,43 +1,56 @@
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const openai = new OpenAI({ apiKey: process.env.GEMINI_API_KEY});
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Debug environment variables
-  console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'OK' : 'MISSING');
-  console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? 'OK' : 'MISSING');
-  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'OK' : 'MISSING');
-  console.log('Request body:', req.body);
-
   try {
     const { message, userId } = req.body;
-    
-    // Test response sederhana dulu
-    if (!message) {
-      return res.status(400).json({ error: 'Message required' });
+    let context = '';
+
+    // Cek jika user tanya tentang transaksi/laporan
+    if (/laporan|transaksi|pengeluaran|pemasukan|bulan/i.test(message)) {
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', userId);
+      
+      if (transactions && transactions.length > 0) {
+        context = `Data transaksi user: ${JSON.stringify(transactions)}`;
+      }
     }
 
-    // Hardcode API key untuk testing (SEMENTARA)
-    const openai = new OpenAI({ 
-      apiKey: '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'
-    });
+    // Build prompt yang benar
+    const prompt = context
+      ? `${context}\n\nUser bertanya: ${message}\n\nJawab berdasarkan data transaksi di atas dalam bahasa Indonesia.`
+      : `User bertanya: ${message}`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "Kamu adalah asisten keuangan." },
-        { role: "user", content: message }
-      ],
-      max_tokens: 100
-    });
-
-    const reply = response.choices[0].message.content;
-    console.log('AI Reply:', reply);
-    
-    return res.status(200).json({ reply });
+      +  const messages = [
++    { role: "system", content: "You are a helpful assistant." },
++    ...(context
++      ? [{ role: "system", content: context }]
++      : []),
++    { role: "user", content: message }
++  ];
++
++  const response = await openai.chat.completions.create({
++    model: "gemini-2.5-flash",      // atau "gemini-2.0-flash" kalau perlu
++    messages
++  });
++
++  // Ambil reply benar-benar dari `response`
++  const reply = response.choices[0].message.content;
++  console.log("AI reply:", reply);
++
++  return res.status(200).json({ reply });
 
   } catch (error) {
-    console.error('Error details:', error);
-    return res.status(500).json({ error: 'Server error', details: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
 }
