@@ -33,20 +33,17 @@ const openai = new OpenAI({
     });
     
     const response = await openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        reasoning_effort: "low",
-        messages: [
-            { role: "system", content: "You are a helpful assistant." },
-            {
-                role: "user",
-                content: "Explain to me how AI works",
-            },
-        ],
-    });
-    
-    console.log(response.choices[0].message);
-  
-    // ────── Kirim balik hasil ke frontend ──────
-    const reply = completion.choices[0].message.content;
-    res.status(200).json({ reply });
+    model: "gemini-2.5-flash",
+    reasoning_effort: "low",
+    messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        {
+            role: "user",
+            content: "Explain to me how AI works",
+        },
+    ],
+});
+
+console.log(response.choices[0].message);
   }
+
