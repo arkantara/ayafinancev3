@@ -1,44 +1,55 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-const supabase = createClient('https://jjieqhvfadoqkahpqdvl.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjU2MTE4MSwiZXhwIjoyMDY4MTM3MTgxfQ.lGGDQiSvem3sHEwFYhUQU4nvnM80TIOMdTTaa2LiBBo');
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
-  });
-  export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
-  
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
     const { message, userId } = req.body;
     let context = '';
-  
-    if (/laporan|transaksi/i.test(message)) {
+
+    // Cek jika user tanya tentang transaksi/laporan
+    if (/laporan|transaksi|pengeluaran|pemasukan|bulan/i.test(message)) {
       const { data: transactions } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', userId);
-      context = `Data transaksi user: ${JSON.stringify(transactions)}`;
+      
+      if (transactions && transactions.length > 0) {
+        context = `Data transaksi user: ${JSON.stringify(transactions)}`;
+      }
     }
-  
-    // ────── Tambahkan prompt builder ──────
+
+    // Build prompt yang benar
     const prompt = context
-      ? `${context}\nUser: ${message}\nAI:`
-      : `User: ${message}\nAI:`;
-  
+      ? `${context}\n\nUser bertanya: ${message}\n\nJawab berdasarkan data transaksi di atas dalam bahasa Indonesia.`
+      : `User bertanya: ${message}`;
+
     const response = await openai.chat.completions.create({
-    model: "gemini-2.0-flash",
-    messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        {
-            role: "user",
-            content: "Explain to me how AI works",
+      model: "gpt-3.5-turbo",
+      messages: [
+        { 
+          role: "system", 
+          content: "Kamu adalah asisten keuangan ayaFinance. Jawab pertanyaan user dalam bahasa Indonesia. Jika ada data transaksi, analisis dan berikan insight yang berguna." 
         },
-    ],
-});
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 500
+    });
 
-console.log(response.choices[0].message);
+    const reply = response.choices[0].message.content;
+    res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
-
-
+}
