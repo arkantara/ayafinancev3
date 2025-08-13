@@ -1500,7 +1500,7 @@ categorySelect.disabled = false;
             // Update welcome message (backup method)
             const welcomeElement = document.getElementById('welcomeUser');
 if (welcomeElement) {
-    welcomeElement.textContent = currentUser.full_name || currentUser.username || 'Admin';
+    welcomeElement.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'Admin';
     console.log('✅ Welcome user updated (backup):', welcomeElement.textContent);
 }
 const emailElement = welcomeElement?.nextElementSibling;
@@ -1511,7 +1511,7 @@ if (emailElement) {
 // Update mobile welcome user (backup method)
 const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
-    mobileWelcomeUser.textContent = currentUser.full_name || currentUser.username || 'User';
+    mobileWelcomeUser.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'User';
     console.log('✅ Mobile welcome user updated (backup):', mobileWelcomeUser.textContent);
 }
 const mobileEmail = mobileWelcomeUser?.nextElementSibling;
@@ -1522,7 +1522,7 @@ if (mobileEmail) {
 // Update profile dropdown info (backup method)
 const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
 if (profileDropdownInfo) {
-    profileDropdownInfo.textContent = currentUser.full_name || currentUser.username || 'Administrator';
+    profileDropdownInfo.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'Administrator';
     console.log('✅ Profile dropdown name updated (backup):', profileDropdownInfo.textContent);
 }
 const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
@@ -1567,8 +1567,12 @@ updatePersonalUserDisplay();
             console.log('📝 username value:', currentUser.username);
             console.log('📝 email value:', currentUser.email);
             
-            // Determine display name dengan prioritas full_name
-            let displayName = currentUser.full_name || currentUser.username || currentUser.email?.split('@')[0] || 'User';
+            // Determine display name dengan prioritas yang benar
+            let displayName = currentUser.full_name || 
+                             currentUser.username || 
+                             currentUser.name ||  // <-- TAMBAH INI untuk field 'name' yang ada
+                             currentUser.email?.split('@')[0] || 
+                             'User';
             
             console.log('🎯 Selected display name:', displayName);
             
@@ -1584,7 +1588,9 @@ updatePersonalUserDisplay();
             // Update email di sebelah welcomeUser
             const emailElement = welcomeElement?.nextElementSibling;
             if (emailElement) {
-                emailElement.textContent = currentUser.email || '';
+                // Jika field name berisi email, gunakan itu. Jika tidak, gunakan field email
+                const emailToShow = currentUser.email || (currentUser.name && currentUser.name.includes('@') ? currentUser.name : '');
+                emailElement.textContent = emailToShow;
             }
             
             // Update mobile welcome user
@@ -1649,7 +1655,7 @@ updatePersonalUserDisplay();
                 const displayName = 
                     currentUser.full_name || 
                     currentUser.username || 
-                    currentUser.name ||
+                    currentUser.name ||    // <-- TAMBAH INI untuk field 'name' yang ada
                     currentUser.email ||
                     `User ID: ${currentUser.id}` ||
                     'Unknown User';
