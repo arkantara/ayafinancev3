@@ -500,6 +500,12 @@
                     <i class="fas fa-user-edit mr-2"></i>
                     Debug User Display
                 </button>
+                
+                <!-- CLEAR LOCALSTORAGE BUTTON FOR TESTING -->
+                <button onclick="clearLocalStorage()" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-trash mr-2"></i>
+                    Clear localStorage (Testing)
+                </button>
             </div>
         </div>
     </div>
@@ -1458,7 +1464,7 @@ categorySelect.disabled = false;
 }
         
         // SINGLE DOMContentLoaded event listener
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 DOM Content Loaded');
             
             // Check login
@@ -1472,7 +1478,26 @@ categorySelect.disabled = false;
             
             console.log('✅ User logged in:', currentUser.username || currentUser.full_name, 'ID:', currentUser.id);
             
-            // Debug user data untuk troubleshooting foto profil
+            // Jika data user tidak lengkap (tidak ada full_name), fetch dari database
+            if (!currentUser.full_name || !currentUser.username) {
+                console.log('🔍 User data incomplete, fetching from database...');
+                const completeUserData = await fetchCompleteUserData(currentUser.id);
+                if (completeUserData) {
+                    currentUser = completeUserData;
+                    console.log('✅ User data updated from database:', currentUser);
+                }
+            }
+            
+            // Function to clear localStorage for testing
+        function clearLocalStorage() {
+            console.log('🗑️ Clearing localStorage...');
+            localStorage.clear();
+            console.log('✅ localStorage cleared. Please login again.');
+            alert('localStorage cleared! Please login again.');
+            window.location.href = 'login.html';
+        }
+
+        // Debug user data untuk troubleshooting foto profil
             console.log('🔍 User data debug:', {
                 id: currentUser.id,
                 username: currentUser.username,
@@ -1551,6 +1576,36 @@ updatePersonalUserDisplay();
             updateProfileAvatars(currentUser);
         }
         
+        // Function untuk fetch user data lengkap dari database
+        async function fetchCompleteUserData(userId) {
+            console.log('🔄 Fetching complete user data from database for ID:', userId);
+            
+            try {
+                // Query database untuk mendapatkan data user lengkap
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('id, username, full_name, email, photo_url')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) {
+                    console.log('❌ Error fetching user from database:', error);
+                    return null;
+                }
+                
+                console.log('✅ Complete user data from database:', userData);
+                
+                // Update localStorage dengan data yang lengkap
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                console.log('💾 Updated localStorage with complete user data');
+                
+                return userData;
+            } catch (error) {
+                console.log('❌ Database query failed:', error);
+                return null;
+            }
+        }
+
         // Fungsi khusus untuk update semua user display elements
         async function updateAllUserDisplays() {
             console.log('👤 Updating all user display elements...');
