@@ -161,16 +161,27 @@
                 } else {
                     showSuccess('Login berhasil! love you aya');
                     if (data && data.user) {
-    const uuid = data.user.id.split(':')[0];
-    const name = data.user.user_metadata?.username || data.user.email;
-    localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
+                        // Extract user info from Supabase response
+                        const user = data.user;
+                        const uuid = user.id.split(':')[0];
+                        
+                        // Save more complete user data
+                        const userData = {
+                            id: uuid, 
+                            email: user.email,
+                            username: user.user_metadata?.username || user.email?.split('@')[0],
+                            full_name: user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0]
+                        };
+                        
+                        console.log('💾 Saving user data to localStorage:', userData);
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
 
-    // Show modal
-    document.getElementById('loginSuccessModal').style.display = 'flex';
-    document.getElementById('loveYouBtn').onclick = function() {
-        window.location.href = 'dashboard.html';
-    };
-}
+                        // Show modal
+                        document.getElementById('loginSuccessModal').style.display = 'flex';
+                        document.getElementById('loveYouBtn').onclick = function() {
+                            window.location.href = 'dashboard.html';
+                        };
+                    }
                 }
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');

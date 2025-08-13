@@ -1554,13 +1554,31 @@ updatePersonalUserDisplay();
             
             const currentUser = JSON.parse(userDataString);
             console.log('👤 Parsed user data:', currentUser);
+            console.log('🔍 Available fields:', Object.keys(currentUser));
+            console.log('📝 full_name:', currentUser.full_name);
+            console.log('📝 username:', currentUser.username);
+            console.log('📝 email:', currentUser.email);
+            console.log('📝 name:', currentUser.name);
+            console.log('📝 id:', currentUser.id);
             
             const personalUserDisplay = document.getElementById('personalUserDisplay');
             if (personalUserDisplay) {
-                const displayName = currentUser.full_name || currentUser.username || 'Unknown User';
+                // Coba berbagai kemungkinan field name
+                const displayName = 
+                    currentUser.full_name || 
+                    currentUser.username || 
+                    currentUser.name ||
+                    currentUser.email ||
+                    `User ID: ${currentUser.id}` ||
+                    'Unknown User';
+                    
                 personalUserDisplay.textContent = `Data: ${displayName}`;
                 personalUserDisplay.style.color = ''; // reset color
                 console.log('✅ Personal user display updated to:', personalUserDisplay.textContent);
+                
+                // Debug tambahan - tampilkan semua field yang tersedia
+                console.log('🎯 Final display name selected:', displayName);
+                console.log('📊 All user fields:', JSON.stringify(currentUser, null, 2));
             } else {
                 console.log('❌ personalUserDisplay element not found');
             }
