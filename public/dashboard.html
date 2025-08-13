@@ -1496,7 +1496,8 @@ categorySelect.disabled = false;
             // Update welcome message
             const welcomeElement = document.getElementById('welcomeUser');
 if (welcomeElement) {
-    welcomeElement.textContent = currentUser.username || currentUser.full_name || 'Admin';
+    welcomeElement.textContent = currentUser.full_name || currentUser.username || 'Admin';
+    console.log('✅ Welcome user updated:', welcomeElement.textContent);
 }
 const emailElement = welcomeElement?.nextElementSibling;
 if (emailElement) {
@@ -1506,11 +1507,24 @@ if (emailElement) {
 // Update mobile welcome user
 const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
-    mobileWelcomeUser.textContent = currentUser.username || currentUser.full_name || 'User';
+    mobileWelcomeUser.textContent = currentUser.full_name || currentUser.username || 'User';
+    console.log('✅ Mobile welcome user updated:', mobileWelcomeUser.textContent);
 }
 const mobileEmail = mobileWelcomeUser?.nextElementSibling;
 if (mobileEmail) {
     mobileEmail.textContent = currentUser.email || '';
+}
+
+// Update profile dropdown info
+const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
+if (profileDropdownInfo) {
+    profileDropdownInfo.textContent = currentUser.full_name || currentUser.username || 'Administrator';
+    console.log('✅ Profile dropdown name updated:', profileDropdownInfo.textContent);
+}
+const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
+if (profileDropdownEmail) {
+    profileDropdownEmail.textContent = currentUser.email || 'user@ayafinance.com';
+    console.log('✅ Profile dropdown email updated:', profileDropdownEmail.textContent);
 }
 
 // Update personal dashboard user display
