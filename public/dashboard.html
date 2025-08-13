@@ -1487,44 +1487,48 @@ categorySelect.disabled = false;
             // Langsung update semua profile avatar
             updateProfileAvatars(currentUser);
             
+            // Update semua user display elements (no await needed)
+            updateAllUserDisplays();
+            
             // Juga setup untuk update berkala
             setTimeout(() => {
                 console.log('🔄 Secondary profile picture update...');
                 updateProfileAvatars(currentUser);
+                updateAllUserDisplays();
             }, 500);
             
-            // Update welcome message
+            // Update welcome message (backup method)
             const welcomeElement = document.getElementById('welcomeUser');
 if (welcomeElement) {
     welcomeElement.textContent = currentUser.full_name || currentUser.username || 'Admin';
-    console.log('✅ Welcome user updated:', welcomeElement.textContent);
+    console.log('✅ Welcome user updated (backup):', welcomeElement.textContent);
 }
 const emailElement = welcomeElement?.nextElementSibling;
 if (emailElement) {
     emailElement.textContent = currentUser.email || '';
 }
 
-// Update mobile welcome user
+// Update mobile welcome user (backup method)
 const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
     mobileWelcomeUser.textContent = currentUser.full_name || currentUser.username || 'User';
-    console.log('✅ Mobile welcome user updated:', mobileWelcomeUser.textContent);
+    console.log('✅ Mobile welcome user updated (backup):', mobileWelcomeUser.textContent);
 }
 const mobileEmail = mobileWelcomeUser?.nextElementSibling;
 if (mobileEmail) {
     mobileEmail.textContent = currentUser.email || '';
 }
 
-// Update profile dropdown info
+// Update profile dropdown info (backup method)
 const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
 if (profileDropdownInfo) {
     profileDropdownInfo.textContent = currentUser.full_name || currentUser.username || 'Administrator';
-    console.log('✅ Profile dropdown name updated:', profileDropdownInfo.textContent);
+    console.log('✅ Profile dropdown name updated (backup):', profileDropdownInfo.textContent);
 }
 const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
 if (profileDropdownEmail) {
     profileDropdownEmail.textContent = currentUser.email || 'user@ayafinance.com';
-    console.log('✅ Profile dropdown email updated:', profileDropdownEmail.textContent);
+    console.log('✅ Profile dropdown email updated (backup):', profileDropdownEmail.textContent);
 }
 
 // Update personal dashboard user display
@@ -1547,6 +1551,70 @@ updatePersonalUserDisplay();
             updateProfileAvatars(currentUser);
         }
         
+        // Fungsi khusus untuk update semua user display elements
+        async function updateAllUserDisplays() {
+            console.log('👤 Updating all user display elements...');
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                console.log('❌ No user data in localStorage');
+                return;
+            }
+            
+            console.log('📦 Current user data:', currentUser);
+            console.log('🔍 Available fields:', Object.keys(currentUser));
+            console.log('📝 full_name value:', currentUser.full_name);
+            console.log('📝 username value:', currentUser.username);
+            console.log('📝 email value:', currentUser.email);
+            
+            // Determine display name dengan prioritas full_name
+            let displayName = currentUser.full_name || currentUser.username || currentUser.email?.split('@')[0] || 'User';
+            
+            console.log('🎯 Selected display name:', displayName);
+            
+            // Update welcomeUser (desktop navigation)
+            const welcomeElement = document.getElementById('welcomeUser');
+            if (welcomeElement) {
+                welcomeElement.textContent = displayName;
+                console.log('✅ welcomeUser updated to:', displayName);
+            } else {
+                console.log('❌ welcomeUser element not found');
+            }
+            
+            // Update email di sebelah welcomeUser
+            const emailElement = welcomeElement?.nextElementSibling;
+            if (emailElement) {
+                emailElement.textContent = currentUser.email || '';
+            }
+            
+            // Update mobile welcome user
+            const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
+            if (mobileWelcomeUser) {
+                mobileWelcomeUser.textContent = displayName;
+                console.log('✅ mobileWelcomeUser updated to:', displayName);
+            }
+            
+            const mobileEmail = mobileWelcomeUser?.nextElementSibling;
+            if (mobileEmail) {
+                mobileEmail.textContent = currentUser.email || '';
+            }
+            
+            // Update profile dropdown info
+            const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
+            if (profileDropdownInfo) {
+                profileDropdownInfo.textContent = displayName;
+                console.log('✅ Profile dropdown name updated to:', displayName);
+            }
+            
+            const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
+            if (profileDropdownEmail) {
+                profileDropdownEmail.textContent = currentUser.email || 'user@ayafinance.com';
+            }
+            
+            // Update personal user display
+            updatePersonalUserDisplay();
+        }
+
         // Fungsi khusus untuk update personal user display
         function updatePersonalUserDisplay() {
             console.log('🔄 Updating personal user display...');
@@ -1889,8 +1957,11 @@ if (debugUserDisplayBtn) {
         console.log('🎯 DOM element:', element);
         console.log('📝 Current text content:', element ? element.textContent : 'NOT FOUND');
         
-        // Force update
+        // Force update personal display
         updatePersonalUserDisplay();
+        
+        // Force update ALL user displays
+        updateAllUserDisplays();
         
         // Show result
         setTimeout(() => {
@@ -2065,6 +2136,11 @@ if (debugUserDisplayBtn) {
             window.updatePersonalDisplay = function() {
                 console.log('🔄 Manual personal display update...');
                 updatePersonalUserDisplay();
+            };
+            
+            window.updateAllDisplays = function() {
+                console.log('🔄 Manual all displays update...');
+                updateAllUserDisplays();
             };
             
             window.updateAvatars = function() {
