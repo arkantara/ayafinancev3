@@ -488,24 +488,6 @@
                     <i class="fas fa-tags mr-2"></i>
                     Kelola Kategori
                 </button>
-                
-                <!-- DEBUG BUTTON - TEMPORARY -->
-                <button id="debugProfileBtn" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center mb-2">
-                    <i class="fas fa-bug mr-2"></i>
-                    Debug Profile Picture
-                </button>
-                
-                <!-- DEBUG BUTTON FOR USER DISPLAY -->
-                <button id="debugUserDisplayBtn" class="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i class="fas fa-user-edit mr-2"></i>
-                    Debug User Display
-                </button>
-                
-                <!-- CLEAR LOCALSTORAGE BUTTON FOR TESTING -->
-                <button onclick="clearLocalStorage()" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i class="fas fa-trash mr-2"></i>
-                    Clear localStorage (Testing)
-                </button>
             </div>
         </div>
     </div>
@@ -1465,8 +1447,6 @@ categorySelect.disabled = false;
         
         // SINGLE DOMContentLoaded event listener
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 DOM Content Loaded');
-            
             // Check login
             currentUser = checkLogin();
             if (!currentUser) return;
@@ -1476,28 +1456,18 @@ categorySelect.disabled = false;
                 currentUser.id = currentUser.id.split(':')[0];
             }
             
-            console.log('✅ User logged in:', currentUser.username || currentUser.full_name, 'ID:', currentUser.id);
+            console.log('✅ User logged in:', currentUser.full_name || currentUser.username || currentUser.email);
             
             // Jika data user tidak lengkap (tidak ada full_name), fetch dari database
             if (!currentUser.full_name || !currentUser.username) {
-                console.log('🔍 User data incomplete, fetching from database...');
                 const completeUserData = await fetchCompleteUserData(currentUser.id);
                 if (completeUserData) {
                     currentUser = completeUserData;
-                    console.log('✅ User data updated from database:', currentUser);
+                    console.log('✅ User data updated from database');
                 }
             }
             
-            // Function to clear localStorage for testing
-        function clearLocalStorage() {
-            console.log('🗑️ Clearing localStorage...');
-            localStorage.clear();
-            console.log('✅ localStorage cleared. Please login again.');
-            alert('localStorage cleared! Please login again.');
-            window.location.href = 'login.html';
-        }
-
-        // Debug user data untuk troubleshooting foto profil
+            // Debug user data untuk troubleshooting foto profil
             console.log('🔍 User data debug:', {
                 id: currentUser.id,
                 username: currentUser.username,
@@ -1578,8 +1548,6 @@ updatePersonalUserDisplay();
         
         // Function untuk fetch user data lengkap dari database
         async function fetchCompleteUserData(userId) {
-            console.log('🔄 Fetching complete user data from database for ID:', userId);
-            
             try {
                 // Query database untuk mendapatkan data user lengkap
                 const { data: userData, error } = await supabase
@@ -1589,47 +1557,34 @@ updatePersonalUserDisplay();
                     .single();
                 
                 if (error) {
-                    console.log('❌ Error fetching user from database:', error);
+                    console.error('Error fetching user from database:', error);
                     return null;
                 }
                 
-                console.log('✅ Complete user data from database:', userData);
-                
                 // Update localStorage dengan data yang lengkap
                 localStorage.setItem('currentUser', JSON.stringify(userData));
-                console.log('💾 Updated localStorage with complete user data');
                 
                 return userData;
             } catch (error) {
-                console.log('❌ Database query failed:', error);
+                console.error('Database query failed:', error);
                 return null;
             }
         }
 
         // Fungsi khusus untuk update semua user display elements
         async function updateAllUserDisplays() {
-            console.log('👤 Updating all user display elements...');
-            
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
-                console.log('❌ No user data in localStorage');
+                console.error('No user data in localStorage');
                 return;
             }
-            
-            console.log('📦 Current user data:', currentUser);
-            console.log('🔍 Available fields:', Object.keys(currentUser));
-            console.log('📝 full_name value:', currentUser.full_name);
-            console.log('📝 username value:', currentUser.username);
-            console.log('📝 email value:', currentUser.email);
             
             // Determine display name dengan prioritas yang benar
             let displayName = currentUser.full_name || 
                              currentUser.username || 
-                             currentUser.name ||  // <-- TAMBAH INI untuk field 'name' yang ada
+                             currentUser.name ||
                              currentUser.email?.split('@')[0] || 
                              'User';
-            
-            console.log('🎯 Selected display name:', displayName);
             
             // Update welcomeUser (desktop navigation)
             const welcomeElement = document.getElementById('welcomeUser');
@@ -1960,81 +1915,6 @@ if (categoriesBtn) {
     console.log('❌ Categories button not found');
 }
 
-// Debug Profile Button handler
-const debugProfileBtn = document.getElementById('debugProfileBtn');
-if (debugProfileBtn) {
-    debugProfileBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🐛 Debug profile button clicked');
-        
-        // Update personal user display
-        updatePersonalUserDisplay();
-        
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        console.log('👤 User data:', user);
-        
-        // Test profile picture URL
-        const profileUrl = user.profile_picture || user.photo_url || user.avatar || user.profile_image;
-        console.log('🖼️ Profile URL:', profileUrl);
-        
-        if (profileUrl) {
-            // Test if image loads
-            const img = new Image();
-            img.onload = function() {
-                alert(`✅ Foto profil berhasil dimuat!\nURL: ${profileUrl}\nUkuran: ${this.width}x${this.height}px`);
-                forceUpdateAvatar();
-            };
-            img.onerror = function() {
-                alert(`❌ Foto profil gagal dimuat!\nURL: ${profileUrl}\nPastikan URL valid dan gambar bisa diakses.`);
-            };
-            img.src = profileUrl;
-        } else {
-            alert('⚠️ Tidak ada URL foto profil ditemukan.\nSilakan upload foto profil di halaman Profile terlebih dahulu.');
-        }
-    };
-    console.log('✅ Debug profile button handler attached');
-}
-
-// Debug User Display Button handler
-const debugUserDisplayBtn = document.getElementById('debugUserDisplayBtn');
-if (debugUserDisplayBtn) {
-    debugUserDisplayBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🐛 Debug user display button clicked');
-        
-        // Check localStorage manually
-        const userDataString = localStorage.getItem('currentUser');
-        console.log('📦 localStorage currentUser:', userDataString);
-        
-        if (userDataString) {
-            const user = JSON.parse(userDataString);
-            console.log('👤 Parsed user:', user);
-        }
-        
-        // Check DOM element
-        const element = document.getElementById('personalUserDisplay');
-        console.log('🎯 DOM element:', element);
-        console.log('📝 Current text content:', element ? element.textContent : 'NOT FOUND');
-        
-        // Force update personal display
-        updatePersonalUserDisplay();
-        
-        // Force update ALL user displays
-        updateAllUserDisplays();
-        
-        // Show result
-        setTimeout(() => {
-            const newContent = element ? element.textContent : 'ELEMENT NOT FOUND';
-            console.log('✅ Updated text content:', newContent);
-            alert(`Personal User Display:\nBefore: Data: User\nAfter: ${newContent}`);
-        }, 100);
-    };
-    console.log('✅ Debug user display button handler attached');
-} else {
-    console.log('❌ Debug user display button not found');
-}
                 // Profile button click handler
                 if (profileBtn && profileDropdown) {
                     profileBtn.addEventListener('click', function(e) {

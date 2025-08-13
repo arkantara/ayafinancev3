@@ -166,7 +166,6 @@
                         const uuid = user.id.split(':')[0];
                         
                         // Fetch complete user data from users table
-                        console.log('🔍 Fetching complete user data from database...');
                         const { data: dbUser, error: dbError } = await supabase
                             .from('users')
                             .select('*')
@@ -175,7 +174,7 @@
                         
                         let userData;
                         if (dbError || !dbUser) {
-                            console.warn('❌ Could not fetch user data from database:', dbError);
+                            console.warn('Could not fetch user data from database:', dbError?.message);
                             // Fallback to auth metadata
                             userData = {
                                 id: uuid, 
@@ -193,10 +192,8 @@
                                 photo_url: dbUser.photo_url,
                                 create_at: dbUser.create_at
                             };
-                            console.log('✅ Complete user data fetched from database:', userData);
                         }
                         
-                        console.log('💾 Saving user data to localStorage:', userData);
                         localStorage.setItem('currentUser', JSON.stringify(userData));
 
                         // Show modal
