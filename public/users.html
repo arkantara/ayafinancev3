@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - Aplikasi Keuangan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-100">
+  <div id="app" class="min-h-screen flex">
+    <aside id="sidebar" class="w-64 bg-white border-r p-4 hidden md:block"></aside>
+    
+    <div class="flex-1 p-6">
+      <header id="header" class="flex justify-between items-center mb-6">
+        <h1 class="text-xl font-bold">User Management</h1>
+      </header>
+      
+      <div id="content">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold mb-4">Manage Users</h2>
+          <form id="user-form" class="mb-4">
+            <input type="text" id="username" placeholder="Username" class="border p-2 rounded mr-2" required>
+            <input type="password" id="password" placeholder="Password" class="border p-2 rounded mr-2" required>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Add User</button>
+          </form>
+          <div id="user-list" class="mt-4">
+            <h3 class="text-md font-semibold">Existing Users</h3>
+            <ul class="list-disc pl-5" id="users"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/users.js"></script>
+</body>
+</html>

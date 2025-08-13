@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ayaFinance - Personal Finance Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen">
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+        <i class="fas fa-wallet text-white text-3xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">ayaFinance</h1>
+      <p class="text-gray-600 mb-4">Personal Finance Management</p>
+      <div class="flex space-x-1 justify-center">
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+      </div>
+      <p class="text-sm text-gray-500 mt-4">Memuat aplikasi...</p>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is already logged in
+    function checkAuthAndRedirect() {
+      const currentUser = localStorage.getItem('currentUser');
+      
+      if (currentUser) {
+        // User sudah login, redirect ke dashboard
+        console.log('User sudah login, redirect ke dashboard');
+        window.location.href = 'dashboard.html';
+      } else {
+        // User belum login, redirect ke login
+        console.log('User belum login, redirect ke login');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show loading for 1.5 seconds then redirect
+      setTimeout(() => {
+        checkAuthAndRedirect();
+      }, 1500);
+    });
+
+    // Fallback redirect jika JavaScript tidak berjalan
+    setTimeout(() => {
+      if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+        window.location.href = '/login.html';
+      }
+    }, 3000);
+  </script>
+
+  <!-- Fallback untuk jika JavaScript disabled -->
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/login.html">
+  </noscript>
+</body>
+</html>

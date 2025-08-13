@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ayaFinance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md mx-4 border border-gray-100">
+        <!-- Header dengan Icon -->
+        <div class="text-center mb-8">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-wallet text-white text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h2>
+            <p class="text-gray-600">Masuk ke akun Anda</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <!-- Email Field -->
+            <div class="relative">
+                <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out" 
+                        placeholder="Masukkan email"
+                        required>
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="relative">
+                <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out" 
+                        placeholder="Masukkan password Anda"
+                        required>
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 focus:outline-none">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <span id="buttonText">Masuk</span>
+                <i id="spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+        </form>
+        <div id="loginSuccessModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; padding:2rem; border-radius:1rem; text-align:center;">
+              <p style="font-size:1.2rem; margin-bottom:1rem;">Login berhasil! loveyou aya</p>
+              <button id="loveYouBtn" style="background:#3b82f6; color:#fff; padding:0.5rem 1.5rem; border:none; border-radius:0.5rem; font-size:1rem;">i love you too</button>
+            </div>
+          </div>
+        <!-- Links 
+        <div class="mt-6 text-center space-y-2">
+            <p class="text-sm text-gray-600">
+                Belum punya akun? 
+                <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium">Daftar di sini</a>
+            </p>
+            <p class="text-xs text-gray-500">
+                <a href="#" class="hover:text-blue-600">Lupa password?</a>
+            </p>
+        </div> -->
+
+        <!-- Demo Credentials 
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">🎯 Demo Credentials:</h4>
+            <div class="text-xs text-gray-600 space-y-1">
+                <p><strong>Email:</strong> test@example.com | <strong>Password:</strong> password</p>
+            </div>
+        </div>
+    </div> -->
+
+    <script>
+        // Ganti URL dan anon key dengan milik Anda dari dashboard Supabase
+        const supabase = window.supabase.createClient(
+            'https://jjieqhvfadoqkahpqdvl.supabase.co', // Ganti dengan URL project Anda
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'                 // Ganti dengan anon key Anda
+        );
+
+        function showLoading(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const buttonText = document.getElementById('buttonText');
+            const spinner = document.getElementById('spinner');
+            if (isLoading) {
+                submitBtn.disabled = true;
+                buttonText.textContent = 'Memproses...';
+                if (spinner) spinner.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = false;
+                buttonText.textContent = 'Masuk';
+                if (spinner) spinner.classList.add('hidden');
+            }
+        }
+
+        function showError(message) {
+            const existingError = document.querySelector('.error-message');
+            if (existingError) existingError.remove();
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4';
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            const form = document.getElementById('loginForm');
+            form.parentNode.insertBefore(errorDiv, form);
+            setTimeout(() => {
+                if (errorDiv.parentNode) errorDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const existingSuccess = document.querySelector('.success-message');
+            if (existingSuccess) existingSuccess.remove();
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4';
+            successDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            const form = document.getElementById('loginForm');
+            form.parentNode.insertBefore(successDiv, form);
+            setTimeout(() => {
+                if (successDiv.parentNode) successDiv.remove();
+            }, 3000);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) {
+                showError('Silakan isi email dan password');
+                return;
+            }
+            showLoading(true);
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    showError(error.message || 'Login gagal');
+                } else {
+                    showSuccess('Login berhasil! love you aya');
+                    if (data && data.user) {
+    const uuid = data.user.id.split(':')[0];
+    const name = data.user.user_metadata?.username || data.user.email;
+    localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
+
+    // Show modal
+    document.getElementById('loginSuccessModal').style.display = 'flex';
+    document.getElementById('loveYouBtn').onclick = function() {
+        window.location.href = 'dashboard.html';
+    };
+}
+                }
+            } catch (err) {
+                showError('Koneksi bermasalah. Silakan coba lagi.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek jika sudah login
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            // Setup form event listener
+            const form = document.getElementById('loginForm');
+            if (form) {
+                form.addEventListener('submit', handleLogin);
+            }
+            // Focus on first input
+            const loginEmail = document.getElementById('loginEmail');
+            if (loginEmail) loginEmail.focus();
+
+            // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const loginPassword = document.getElementById('loginPassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (togglePassword && loginPassword && eyeIcon) {
+        togglePassword.addEventListener('click', function() {
+            if (loginPassword.type === 'password') {
+                loginPassword.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                loginPassword.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+    }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Keuangan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/reports.js" defer></script>
+</head>
+<body class="bg-gray-100">
+  <div id="app" class="min-h-screen flex">
+    <aside id="sidebar" class="w-64 bg-white border-r p-4 hidden md:block"></aside>
+    
+    <div class="flex-1 p-6">
+      <header id="header" class="flex justify-between items-center mb-6"></header>
+      
+      <div id="content">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h1 class="text-xl font-bold mb-4">Laporan Keuangan</h1>
+          <div id="report-summary" class="mb-6">
+            <p class="text-gray-600">Menampilkan ringkasan pendapatan dan pengeluaran.</p>
+            <canvas id="reportChart"></canvas>
+          </div>
+          <div id="report-history">
+            <h2 class="text-lg font-semibold mb-2">Riwayat Transaksi</h2>
+            <table class="min-w-full bg-white border border-gray-300">
+              <thead>
+                <tr>
+                  <th class="border-b p-2">Tanggal</th>
+                  <th class="border-b p-2">Kategori</th>
+                  <th class="border-b p-2">Jumlah</th>
+                  <th class="border-b p-2">Tipe</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Data riwayat transaksi akan dimuat di sini -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
