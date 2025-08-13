@@ -180,6 +180,9 @@
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fas fa-cog mr-2"></i>Pengaturan
                                 </a>
+                                <a href="#" id="refreshProfileBtn" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-sync-alt mr-2"></i>Refresh Profile
+                                </a>
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fas fa-bell mr-2"></i>Notifikasi
                                 </a>
@@ -221,9 +224,24 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 py-6">
         <!-- Header Section -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
-            <p class="text-gray-600">Selamat datang kembali! Berikut adalah ringkasan keuangan Anda hari ini.</p>
+        <div class="mb-8 bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border border-purple-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                        <i class="fas fa-globe text-purple-600 mr-3"></i>
+                        Dashboard Global
+                    </h2>
+                    <p class="text-gray-600" id="dashboardSubtitle">Selamat datang! Berikut adalah ringkasan keuangan dari semua pengguna.</p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <div class="bg-purple-50 border border-purple-200 px-4 py-2 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-globe text-purple-600"></i>
+                            <span class="text-sm font-medium text-purple-800" id="currentUserDisplay">Data Global - Semua User</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Stats Cards -->
@@ -232,7 +250,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Total Saldo</p>
+                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Total Saldo (Semua User)</p>
                         <p class="text-lg md:text-3xl font-bold text-gray-800 mobile-text-2xl break-words" id="totalBalance">Rp 0</p>
                         <p class="text-xs md:text-sm text-green-600 mt-1">
                            <!--  <i class="fas fa-arrow-up text-xs mr-1"></i>
@@ -249,7 +267,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pemasukan Bulan Ini</p>
+                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pemasukan Bulan Ini (Global)</p>
                         <p class="text-lg md:text-3xl font-bold text-green-600 mobile-text-2xl break-words" id="monthlyIncome">Rp 0</p>
                         <p class="text-xs md:text-sm text-green-600 mt-1">
                             <!-- <i class="fas fa-arrow-up text-xs mr-1"></i>
@@ -266,7 +284,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pengeluaran Bulan Ini</p>
+                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pengeluaran Bulan Ini (Global)</p>
                         <p class="text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words" id="monthlyExpense">Rp 0</p>
                         <p class="text-xs md:text-sm text-red-600 mt-1">
                             <!-- <i class="fas fa-arrow-down text-xs mr-1"></i>
@@ -283,15 +301,140 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Target Tabungan</p>
-                        <p class="text-lg md:text-3xl font-bold text-purple-600 mobile-text-2xl break-words" id="savingsTarget">Rp 0</p>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style="width: 45%"></div>
-                        </div>
-                        <!-- <p class="text-xs text-gray-500 mt-1">45% tercapai</p>-->
+                        <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Jumlah User Aktif</p>
+                        <p class="text-lg md:text-3xl font-bold text-purple-600 mobile-text-2xl break-words" id="activeUsers">0</p>
+                        <p class="text-xs md:text-sm text-gray-500 mt-1" id="totalTransactions">0 transaksi total</p>
                     </div>
                     <div class="bg-gradient-to-r from-purple-500 to-pink-500 w-8 h-8 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                        <i class="fas fa-piggy-bank text-white text-sm md:text-xl"></i>
+                        <i class="fas fa-users text-white text-sm md:text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Separator -->
+        <div class="mb-8">
+            <div class="flex items-center justify-center">
+                <div class="border-t border-gray-200 flex-grow"></div>
+                <div class="mx-6">
+                    <div class="bg-gradient-to-r from-gray-400 to-gray-600 text-white px-6 py-2 rounded-full text-sm font-medium shadow-md">
+                        <i class="fas fa-chevron-down mr-2"></i>
+                        Dashboard Personal
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 flex-grow"></div>
+            </div>
+        </div>
+
+        <!-- Personal Dashboard Section -->
+        <div class="mb-8 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-2xl border border-green-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                        <i class="fas fa-user-circle text-green-600 mr-3"></i>
+                        Dashboard Personal
+                    </h2>
+                    <p class="text-gray-600">Ringkasan keuangan pribadi Anda</p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <div class="bg-green-50 border border-green-200 px-4 py-2 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-user-circle text-green-600"></i>
+                            <span class="text-sm font-medium text-green-800" id="personalUserDisplay">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8 stats-grid">
+                <!-- Personal Total Balance -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Saldo Personal Anda</p>
+                            <p class="text-lg md:text-3xl font-bold text-gray-800 mobile-text-2xl break-words" id="personalTotalBalance">Rp 0</p>
+                            <p class="text-xs md:text-sm text-blue-600 mt-1">
+                                <i class="fas fa-user text-xs mr-1"></i>
+                                Data pribadi
+                            </p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-8 h-8 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                            <i class="fas fa-wallet text-white text-sm md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Personal Income -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pemasukan Personal</p>
+                            <p class="text-lg md:text-3xl font-bold text-green-600 mobile-text-2xl break-words" id="personalMonthlyIncome">Rp 0</p>
+                            <p class="text-xs md:text-sm text-green-600 mt-1">
+                                <i class="fas fa-calendar-alt text-xs mr-1"></i>
+                                Bulan ini
+                            </p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-500 to-emerald-500 w-8 h-8 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                            <i class="fas fa-arrow-up text-white text-sm md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Personal Expenses -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Pengeluaran Personal</p>
+                            <p class="text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words" id="personalMonthlyExpense">Rp 0</p>
+                            <p class="text-xs md:text-sm text-red-600 mt-1">
+                                <i class="fas fa-calendar-alt text-xs mr-1"></i>
+                                Bulan ini
+                            </p>
+                        </div>
+                        <div class="bg-gradient-to-r from-red-500 to-pink-500 w-8 h-8 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                            <i class="fas fa-arrow-down text-white text-sm md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Transaction Count -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow mobile-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs md:text-sm font-medium text-gray-500 mb-1">Transaksi Anda</p>
+                            <p class="text-lg md:text-3xl font-bold text-indigo-600 mobile-text-2xl break-words" id="personalTransactionCount">0</p>
+                            <p class="text-xs md:text-sm text-gray-500 mt-1" id="personalMonthlyTransactions">0 bulan ini</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 w-8 h-8 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                            <i class="fas fa-list-alt text-white text-sm md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                <!-- Personal Category Breakdown -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mobile-card">
+                    <div class="flex items-center justify-between mb-4 md:mb-6">
+                        <h3 class="text-base md:text-lg font-semibold text-gray-800">Kategori Pengeluaran Personal</h3>
+                    </div>
+                    <div class="relative h-48 md:h-64 chart-container">
+                        <canvas id="personalCategoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Personal Monthly Trend -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mobile-card">
+                    <div class="flex items-center justify-between mb-4 md:mb-6">
+                        <h3 class="text-base md:text-lg font-semibold text-gray-800">Trend Personal</h3>
+                        <div class="text-xs text-gray-500">6 bulan terakhir</div>
+                    </div>
+                    <div class="relative h-48 md:h-64 chart-container">
+                        <canvas id="personalTrendChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -302,7 +445,7 @@
             <!-- Income vs Expense Chart -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mobile-card">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-0">Pemasukan vs Pengeluaran</h3>
+                    <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-0">Pemasukan vs Pengeluaran (Global)</h3>
                     <select class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-sm w-full sm:w-auto">
                         <option>6 Bulan Terakhir</option>
                         <option>3 Bulan Terakhir</option>
@@ -317,7 +460,7 @@
             <!-- Category Breakdown -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mobile-card">
                 <div class="flex items-center justify-between mb-4 md:mb-6">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-800">Kategori Pengeluaran</h3>
+                    <h3 class="text-base md:text-lg font-semibold text-gray-800">Kategori Pengeluaran (Global)</h3>
                 </div>
                 <div class="relative h-48 md:h-64 chart-container">
                     <canvas id="categoryChart"></canvas>
@@ -506,28 +649,33 @@ const supabase = window.supabase.createClient(
         return;
     }
 
-    // Pastikan hanya UUID
-if (currentUser.id) {
-    currentUser.id = currentUser.id.split(':')[0];
-}
+    console.log('👤 Loading data for all users (global dashboard)');
 
-    // Ambil semua transaksi user
+    // Ambil SEMUA transaksi dari SEMUA user
     const { data: transactions, error } = await supabase
-    .from('transactions')
-    .select('*');
+        .from('transactions')
+        .select('*');
 
     if (error) {
-        showError('Gagal mengambil data transaksi');
+        console.error('❌ Error fetching transactions:', error);
+        showError('Gagal mengambil data transaksi: ' + error.message);
+        showErrorState();
         return;
     }
 
-    if (error) {
-    showError('Gagal mengambil data transaksi');
-    return;
-}
-updateDashboardMetrics(transactions);
-await renderCategoryExpenseChart(transactions);
-hideLoadingState();
+    console.log(`✅ Loaded ${transactions ? transactions.length : 0} total transactions from all users`);
+    
+    // Hitung berapa user yang memiliki transaksi
+    const uniqueUsers = transactions ? [...new Set(transactions.map(t => t.user_id))].length : 0;
+    console.log(`👥 Data from ${uniqueUsers} unique users`);
+    
+    // Update dashboard dengan semua transaksi
+    updateDashboardMetrics(transactions || [], uniqueUsers);
+    await renderCategoryExpenseChart(transactions || []);
+    
+    // Load personal dashboard data
+    await loadPersonalDashboardData(transactions || []);
+    
     hideLoadingState();
 }
 
@@ -579,8 +727,9 @@ function hideLoadingState() {
         }
         
         // Update dashboard metrics
-        function updateDashboardMetrics(transactions) {
-            console.log('📈 Calculating dashboard metrics...');
+        function updateDashboardMetrics(transactions, uniqueUsers = 0) {
+            console.log('📈 Calculating dashboard metrics from all users...');
+            console.log(`📊 Processing ${transactions.length} total transactions from ${uniqueUsers} users`);
             
             // Get current month and year
             const now = new Date();
@@ -589,7 +738,7 @@ function hideLoadingState() {
             
             console.log('📅 Current month/year:', currentMonth, currentYear);
             
-            // Calculate total balance (all time)
+            // Calculate total balance (all time) - DARI SEMUA TRANSAKSI SEMUA USER
             const totalIncome = transactions
                 .filter(t => t.type === 'income')
                 .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
@@ -600,7 +749,7 @@ function hideLoadingState() {
             
             const totalBalance = totalIncome - totalExpense;
             
-            // Calculate current month income and expense
+            // Calculate current month income and expense - DARI SEMUA TRANSAKSI SEMUA USER
             const currentMonthTransactions = transactions.filter(t => {
                 const transactionDate = new Date(t.date);
                 const transactionMonth = transactionDate.getMonth() + 1;
@@ -617,12 +766,13 @@ function hideLoadingState() {
                 .filter(t => t.type === 'expense')
                 .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
             
-            console.log('💰 Calculated metrics:', {
+            console.log('💰 Global financial metrics:', {
                 totalBalance,
                 monthlyIncome,
                 monthlyExpense,
                 totalTransactions: transactions.length,
-                currentMonthTransactions: currentMonthTransactions.length
+                currentMonthTransactions: currentMonthTransactions.length,
+                uniqueUsers: uniqueUsers
             });
             
             // Update DOM elements
@@ -631,7 +781,24 @@ function hideLoadingState() {
             updateDashboardElement('monthlyIncome', monthlyIncome, 'text-lg md:text-3xl font-bold text-green-600 mobile-text-2xl break-words');
             updateDashboardElement('monthlyExpense', monthlyExpense, 'text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words');
             
-            console.log('✅ Dashboard metrics updated successfully');
+            // Update user count display
+            const currentUserDisplay = document.getElementById('currentUserDisplay');
+            if (currentUserDisplay) {
+                currentUserDisplay.textContent = `Data Global - ${uniqueUsers} User${uniqueUsers !== 1 ? 's' : ''}`;
+            }
+            
+            // Update stats card
+            const activeUsersElement = document.getElementById('activeUsers');
+            if (activeUsersElement) {
+                activeUsersElement.textContent = uniqueUsers;
+            }
+            
+            const totalTransactionsElement = document.getElementById('totalTransactions');
+            if (totalTransactionsElement) {
+                totalTransactionsElement.textContent = `${transactions.length} transaksi total`;
+            }
+            
+            console.log('✅ Global dashboard metrics updated successfully');
         }
         
         // Update individual dashboard element
@@ -647,14 +814,20 @@ function hideLoadingState() {
         }
         
         async function renderCategoryExpenseChart(transactions) {
+    console.log('📊 Rendering category expense chart with', transactions.length, 'transactions from all users');
+    
     // Ambil kategori pengeluaran dari database
     const { data: categories, error } = await supabase
         .from('categories')
         .select('id, name')
         .eq('type', 'expense');
-    if (error || !categories) return;
+    
+    if (error || !categories) {
+        console.error('❌ Error fetching categories:', error);
+        return;
+    }
 
-    // Hitung total pengeluaran per kategori
+    // Hitung total pengeluaran per kategori dari SEMUA USER
     const expenseByCategory = {};
     categories.forEach(cat => expenseByCategory[cat.id] = 0);
 
@@ -665,6 +838,8 @@ function hideLoadingState() {
                 expenseByCategory[t.category_id] += parseFloat(t.amount || 0);
             }
         });
+
+    console.log('💰 Global category expenses:', expenseByCategory);
 
     // Siapkan data chart
     const labels = categories.map(cat => cat.name);
@@ -699,11 +874,286 @@ function hideLoadingState() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } }
+                plugins: { 
+                    legend: { position: 'bottom' },
+                    title: {
+                        display: true,
+                        text: 'Pengeluaran Semua User'
+                    }
+                }
             }
         });
+        console.log('✅ Global category chart rendered successfully');
     }
 }
+
+        // Load personal dashboard data
+        async function loadPersonalDashboardData(allTransactions) {
+            console.log('👤 Loading personal dashboard data...');
+            
+            // Get current user
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            let userId = currentUser.id;
+            if (userId && userId.includes(':')) {
+                userId = userId.split(':')[0];
+            }
+            
+            // Filter transaksi untuk user yang login
+            const userTransactions = allTransactions.filter(t => t.user_id === userId);
+            console.log(`📊 Found ${userTransactions.length} transactions for current user`);
+            
+            // Update personal dashboard
+            updatePersonalDashboardMetrics(userTransactions, currentUser);
+            await renderPersonalCategoryChart(userTransactions);
+            await renderPersonalTrendChart(userTransactions);
+        }
+        
+        // Update personal dashboard metrics
+        function updatePersonalDashboardMetrics(transactions, currentUser) {
+            console.log('📈 Calculating personal dashboard metrics...');
+            
+            // Get current month and year
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+            
+            // Calculate personal totals
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            
+            const personalBalance = totalIncome - totalExpense;
+            
+            // Calculate current month personal data
+            const currentMonthTransactions = transactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                const transactionMonth = transactionDate.getMonth() + 1;
+                const transactionYear = transactionDate.getFullYear();
+                
+                return transactionMonth === currentMonth && transactionYear === currentYear;
+            });
+            
+            const monthlyIncome = currentMonthTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            
+            const monthlyExpense = currentMonthTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            
+            console.log('💰 Personal financial metrics:', {
+                personalBalance,
+                monthlyIncome,
+                monthlyExpense,
+                totalTransactions: transactions.length,
+                monthlyTransactions: currentMonthTransactions.length
+            });
+            
+            // Update personal DOM elements
+            updateDashboardElement('personalTotalBalance', personalBalance, 
+                personalBalance >= 0 ? 'text-lg md:text-3xl font-bold text-gray-800 mobile-text-2xl break-words' : 'text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words');
+            updateDashboardElement('personalMonthlyIncome', monthlyIncome, 'text-lg md:text-3xl font-bold text-green-600 mobile-text-2xl break-words');
+            updateDashboardElement('personalMonthlyExpense', monthlyExpense, 'text-lg md:text-3xl font-bold text-red-600 mobile-text-2xl break-words');
+            
+            // Update personal info
+            const personalUserDisplay = document.getElementById('personalUserDisplay');
+            if (personalUserDisplay) {
+                personalUserDisplay.textContent = `Data: ${currentUser.full_name || currentUser.username || 'User'}`;
+                console.log('✅ Personal user display updated in loadPersonalDashboardData:', personalUserDisplay.textContent);
+            }
+            
+            // Update transaction counts
+            const personalTransactionCount = document.getElementById('personalTransactionCount');
+            if (personalTransactionCount) {
+                personalTransactionCount.textContent = transactions.length;
+            }
+            
+            const personalMonthlyTransactions = document.getElementById('personalMonthlyTransactions');
+            if (personalMonthlyTransactions) {
+                personalMonthlyTransactions.textContent = `${currentMonthTransactions.length} bulan ini`;
+            }
+            
+            console.log('✅ Personal dashboard metrics updated successfully');
+        }
+
+        // Render personal category chart
+        async function renderPersonalCategoryChart(transactions) {
+            console.log('👤 Rendering personal category chart...');
+            
+            // Ambil kategori pengeluaran dari database
+            const { data: categories, error } = await supabase
+                .from('categories')
+                .select('id, name')
+                .eq('type', 'expense');
+            
+            if (error || !categories) {
+                console.error('❌ Error fetching categories:', error);
+                return;
+            }
+
+            // Hitung pengeluaran per kategori untuk user ini
+            const expenseByCategory = {};
+            categories.forEach(cat => expenseByCategory[cat.id] = 0);
+
+            transactions
+                .filter(t => t.type === 'expense')
+                .forEach(t => {
+                    if (expenseByCategory[t.category_id] !== undefined) {
+                        expenseByCategory[t.category_id] += parseFloat(t.amount || 0);
+                    }
+                });
+
+            // Siapkan data chart
+            const labels = categories.map(cat => cat.name);
+            const data = categories.map(cat => expenseByCategory[cat.id]);
+
+            // Render chart
+            const ctx = document.getElementById('personalCategoryChart');
+            if (ctx) {
+                if (window.personalCategoryChart && typeof window.personalCategoryChart.destroy === 'function') {
+                    window.personalCategoryChart.destroy();
+                }
+                
+                window.personalCategoryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                'rgb(34, 197, 94)',   // Green
+                                'rgb(59, 130, 246)',  // Blue
+                                'rgb(239, 68, 68)',   // Red
+                                'rgb(168, 85, 247)',  // Purple
+                                'rgb(249, 115, 22)',  // Orange
+                                'rgb(251, 191, 36)',  // Yellow
+                                'rgb(16, 185, 129)',  // Emerald
+                                'rgb(236, 72, 153)'   // Pink
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { 
+                                position: 'bottom',
+                                labels: { usePointStyle: true }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Personal category chart rendered');
+            }
+        }
+
+        // Render personal trend chart
+        async function renderPersonalTrendChart(transactions) {
+            console.log('👤 Rendering personal trend chart...');
+            
+            // Generate last 6 months data
+            const months = [];
+            const incomeData = [];
+            const expenseData = [];
+            
+            const now = new Date();
+            
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                
+                // Month label
+                months.push(date.toLocaleDateString('id-ID', { month: 'short' }));
+                
+                // Filter transactions for this month
+                const monthTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.getMonth() + 1 === month && 
+                           transactionDate.getFullYear() === year;
+                });
+                
+                // Calculate income and expense
+                const monthIncome = monthTransactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+                    
+                const monthExpense = monthTransactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+                
+                incomeData.push(monthIncome);
+                expenseData.push(monthExpense);
+            }
+
+            // Render chart
+            const ctx = document.getElementById('personalTrendChart');
+            if (ctx) {
+                if (window.personalTrendChart && typeof window.personalTrendChart.destroy === 'function') {
+                    window.personalTrendChart.destroy();
+                }
+                
+                window.personalTrendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Pemasukan',
+                            data: incomeData,
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            pointBackgroundColor: 'rgb(34, 197, 94)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }, {
+                            label: 'Pengeluaran',
+                            data: expenseData,
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            pointBackgroundColor: 'rgb(239, 68, 68)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { position: 'bottom' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value >= 1000000) {
+                                            return 'Rp ' + (value / 1000000) + 'M';
+                                        } else if (value >= 1000) {
+                                            return 'Rp ' + (value / 1000) + 'K';
+                                        }
+                                        return 'Rp ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Personal trend chart rendered');
+            }
+        }
 
         // Initialize charts - FIXED VERSION
         function initializeCharts() {
@@ -715,10 +1165,10 @@ function hideLoadingState() {
                 return;
             }
             
-            // Income vs Expense Chart
+            // Income vs Expense Chart - menampilkan data global
             const ctx1 = document.getElementById('incomeExpenseChart');
             if (ctx1) {
-                console.log('📊 Creating income expense chart...');
+                console.log('📊 Creating global income expense chart...');
                 
                 // Safe destroy
                 if (window.incomeExpenseChart && typeof window.incomeExpenseChart.destroy === 'function') {
@@ -731,15 +1181,15 @@ function hideLoadingState() {
                         data: {
                             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                             datasets: [{
-                                label: 'Pemasukan',
-                                data: [5000000, 5200000, 4800000, 5500000, 5100000, 5300000],
+                                label: 'Pemasukan Global',
+                                data: [0, 0, 0, 0, 0, 0], // Data akan diupdate dengan data semua user
                                 borderColor: 'rgb(34, 197, 94)',
                                 backgroundColor: 'rgba(34, 197, 94, 0.1)',
                                 tension: 0.4,
                                 fill: true
                             }, {
-                                label: 'Pengeluaran',
-                                data: [3500000, 3800000, 3200000, 4100000, 3600000, 3900000],
+                                label: 'Pengeluaran Global',
+                                data: [0, 0, 0, 0, 0, 0], // Data akan diupdate dengan data semua user
                                 borderColor: 'rgb(239, 68, 68)',
                                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
                                 tension: 0.4,
@@ -749,7 +1199,13 @@ function hideLoadingState() {
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } },
+                            plugins: { 
+                                legend: { position: 'bottom' },
+                                title: {
+                                    display: true,
+                                    text: 'Data dari semua pengguna'
+                                }
+                            },
                             scales: {
                                 y: {
                                     beginAtZero: true,
@@ -762,9 +1218,9 @@ function hideLoadingState() {
                             }
                         }
                     });
-                    console.log('✅ Income vs Expense chart initialized');
+                    console.log('✅ Global income vs expense chart initialized');
                 } catch (error) {
-                    console.error('❌ Error creating income expense chart:', error);
+                    console.error('❌ Error creating global income expense chart:', error);
                 }
             }
         
@@ -899,6 +1355,17 @@ categorySelect.disabled = false;
     }
     
     try {
+        // Get current user
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            throw new Error('User tidak ditemukan. Silakan login kembali.');
+        }
+
+        let userId = currentUser.id;
+        if (userId && userId.includes(':')) {
+            userId = userId.split(':')[0];
+        }
+
         // Get form values
         const typeValue = document.getElementById('transactionType').value;
         const amountValue = document.getElementById('amount').value.replace(/\./g, '');
@@ -932,7 +1399,7 @@ categorySelect.disabled = false;
         const selectedOption = categorySelect.options[categorySelect.selectedIndex];
         const categoryName = selectedOption ? selectedOption.textContent : '';
         
-        console.log('📊 Form data:', {
+        console.log('📊 Form data for user', userId, ':', {
             type: typeValue,
             amount: amountValue,
             category_id: categoryValue,
@@ -941,39 +1408,29 @@ categorySelect.disabled = false;
             date: dateValue
         });
         
-        // Prepare form data
-        //const formData = new FormData();
-        //formData.append('action', 'create');
-        //formData.append('user_id', '1');
-        //formData.append('type', typeValue);
-        //formData.append('amount', amountValue);
-        //formData.append('category_id', categoryValue); // NEW: category ID
-        //formData.append('category', categoryName); // LEGACY: category name (keep for backward compatibility)
-        //formData.append('description', descriptionValue);
-        //formData.append('date', dateValue);
-        
+        // Simpan transaksi dengan user_id yang benar
         const { error } = await supabase.from('transactions').insert([{
-    user_id: currentUser.id,
-    type: typeValue,
-    amount: parseFloat(amountValue),
-    category_id: categoryValue,
-    category: categoryName,
-    description: descriptionValue,
-    date: dateValue
-}]);
+            user_id: userId,
+            type: typeValue,
+            amount: parseFloat(amountValue),
+            category_id: categoryValue,
+            category: categoryName,
+            description: descriptionValue,
+            date: dateValue
+        }]);
 
-if (!error) {
-    // Close modal
-    document.getElementById('transactionModal').classList.add('hidden');
-    // Reset form
-    document.getElementById('transactionForm').reset();
-    document.getElementById('transactionType').value = '';
-    // Reload dashboard data
-    await loadDashboardData();
-    alert('✅ Transaksi berhasil disimpan!');
-} else {
-    throw new Error(error.message || 'Gagal menyimpan transaksi');
-}
+        if (!error) {
+            // Close modal
+            document.getElementById('transactionModal').classList.add('hidden');
+            // Reset form
+            document.getElementById('transactionForm').reset();
+            document.getElementById('transactionType').value = '';
+            // Reload both global and personal dashboard data
+            await loadDashboardData();
+            alert('✅ Transaksi berhasil disimpan! Dashboard global dan personal telah diperbarui.');
+        } else {
+            throw new Error(error.message || 'Gagal menyimpan transaksi');
+        }
 
         
     } catch (error) {
@@ -989,47 +1446,352 @@ if (!error) {
 }
         
         // SINGLE DOMContentLoaded event listener
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM Content Loaded');
-            
+        document.addEventListener('DOMContentLoaded', async function() {
             // Check login
             currentUser = checkLogin();
             if (!currentUser) return;
             
-            // TAMPILKAN FOTO PROFIL USER DI BUTTON PROFILE
-            document.querySelectorAll('#profileAvatar').forEach(profileAvatar => {
-    if (currentUser.photo_url && currentUser.photo_url.trim() !== '') {
-        profileAvatar.innerHTML = `<img src="${currentUser.photo_url}" alt="Foto Profil" class="w-8 h-8 object-cover rounded-full">`;
-        profileAvatar.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
-    } else {
-        profileAvatar.innerHTML = `<i class="fas fa-user text-white text-sm"></i>`;
-        profileAvatar.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
-    }
-});
-
-            console.log('✅ User logged in:', currentUser);
+            // Pastikan user ID dalam format yang benar
+            if (currentUser.id && currentUser.id.includes(':')) {
+                currentUser.id = currentUser.id.split(':')[0];
+            }
             
-            // Update welcome message
+            console.log('✅ User logged in:', currentUser.full_name || currentUser.username || currentUser.email);
+            
+            // Jika data user tidak lengkap (tidak ada full_name), fetch dari database
+            if (!currentUser.full_name || !currentUser.username) {
+                const completeUserData = await fetchCompleteUserData(currentUser.id);
+                if (completeUserData) {
+                    currentUser = completeUserData;
+                    console.log('✅ User data updated from database');
+                }
+            }
+            
+            // Debug user data untuk troubleshooting foto profil
+            console.log('🔍 User data debug:', {
+                id: currentUser.id,
+                username: currentUser.username,
+                full_name: currentUser.full_name,
+                email: currentUser.email,
+                photo_url: currentUser.photo_url
+            });
+            
+            // TAMPILKAN FOTO PROFIL USER DI BUTTON PROFILE
+            console.log('🖼️ Starting profile picture setup...');
+            
+            // Langsung update semua profile avatar
+            updateProfileAvatars(currentUser);
+            
+            // Update semua user display elements (no await needed)
+            updateAllUserDisplays();
+            
+            // Juga setup untuk update berkala
+            setTimeout(() => {
+                console.log('🔄 Secondary profile picture update...');
+                updateProfileAvatars(currentUser);
+                updateAllUserDisplays();
+            }, 500);
+            
+            // Update welcome message (backup method)
             const welcomeElement = document.getElementById('welcomeUser');
 if (welcomeElement) {
-    welcomeElement.textContent = currentUser.username || currentUser.name || currentUser.full_name || 'Admin';
+    welcomeElement.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'Admin';
+    console.log('✅ Welcome user updated (backup):', welcomeElement.textContent);
 }
 const emailElement = welcomeElement?.nextElementSibling;
 if (emailElement) {
     emailElement.textContent = currentUser.email || '';
 }
 
-// Update mobile welcome user
+// Update mobile welcome user (backup method)
 const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
 if (mobileWelcomeUser) {
-    mobileWelcomeUser.textContent = currentUser.username || currentUser.name || currentUser.full_name || 'User';
+    mobileWelcomeUser.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'User';
+    console.log('✅ Mobile welcome user updated (backup):', mobileWelcomeUser.textContent);
 }
 const mobileEmail = mobileWelcomeUser?.nextElementSibling;
 if (mobileEmail) {
     mobileEmail.textContent = currentUser.email || '';
 }
+
+// Update profile dropdown info (backup method)
+const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
+if (profileDropdownInfo) {
+    profileDropdownInfo.textContent = currentUser.full_name || currentUser.username || currentUser.name || 'Administrator';
+    console.log('✅ Profile dropdown name updated (backup):', profileDropdownInfo.textContent);
+}
+const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
+if (profileDropdownEmail) {
+    profileDropdownEmail.textContent = currentUser.email || 'user@ayafinance.com';
+    console.log('✅ Profile dropdown email updated (backup):', profileDropdownEmail.textContent);
+}
+
+// Update personal dashboard user display
+const personalUserDisplay = document.getElementById('personalUserDisplay');
+if (personalUserDisplay) {
+    personalUserDisplay.textContent = `Data: ${currentUser.full_name || currentUser.username || 'User'}`;
+    console.log('✅ Personal user display updated:', personalUserDisplay.textContent);
+}
+
+// Panggil juga function khusus untuk memastikan
+updatePersonalUserDisplay();
+
+        // Dashboard tetap menampilkan data global - tidak perlu update user display lagi
+        
+        // Refresh profile picture - fungsi untuk update foto profil
+        function refreshProfilePicture() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
             
-            // Initialize charts
+            updateProfileAvatars(currentUser);
+        }
+        
+        // Function untuk fetch user data lengkap dari database
+        async function fetchCompleteUserData(userId) {
+            try {
+                // Query database untuk mendapatkan data user lengkap
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('id, username, full_name, email, photo_url')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) {
+                    console.error('Error fetching user from database:', error);
+                    return null;
+                }
+                
+                // Update localStorage dengan data yang lengkap
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                return userData;
+            } catch (error) {
+                console.error('Database query failed:', error);
+                return null;
+            }
+        }
+
+        // Fungsi khusus untuk update semua user display elements
+        async function updateAllUserDisplays() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                console.error('No user data in localStorage');
+                return;
+            }
+            
+            // Determine display name dengan prioritas yang benar
+            let displayName = currentUser.full_name || 
+                             currentUser.username || 
+                             currentUser.name ||
+                             currentUser.email?.split('@')[0] || 
+                             'User';
+            
+            // Update welcomeUser (desktop navigation)
+            const welcomeElement = document.getElementById('welcomeUser');
+            if (welcomeElement) {
+                welcomeElement.textContent = displayName;
+                console.log('✅ welcomeUser updated to:', displayName);
+            } else {
+                console.log('❌ welcomeUser element not found');
+            }
+            
+            // Update email di sebelah welcomeUser
+            const emailElement = welcomeElement?.nextElementSibling;
+            if (emailElement) {
+                // Jika field name berisi email, gunakan itu. Jika tidak, gunakan field email
+                const emailToShow = currentUser.email || (currentUser.name && currentUser.name.includes('@') ? currentUser.name : '');
+                emailElement.textContent = emailToShow;
+            }
+            
+            // Update mobile welcome user
+            const mobileWelcomeUser = document.getElementById('mobileWelcomeUser');
+            if (mobileWelcomeUser) {
+                mobileWelcomeUser.textContent = displayName;
+                console.log('✅ mobileWelcomeUser updated to:', displayName);
+            }
+            
+            const mobileEmail = mobileWelcomeUser?.nextElementSibling;
+            if (mobileEmail) {
+                mobileEmail.textContent = currentUser.email || '';
+            }
+            
+            // Update profile dropdown info
+            const profileDropdownInfo = document.querySelector('#profileDropdown .border-b p');
+            if (profileDropdownInfo) {
+                profileDropdownInfo.textContent = displayName;
+                console.log('✅ Profile dropdown name updated to:', displayName);
+            }
+            
+            const profileDropdownEmail = document.querySelector('#profileDropdown .border-b p + p');
+            if (profileDropdownEmail) {
+                profileDropdownEmail.textContent = currentUser.email || 'user@ayafinance.com';
+            }
+            
+            // Update personal user display
+            updatePersonalUserDisplay();
+        }
+
+        // Fungsi khusus untuk update personal user display
+        function updatePersonalUserDisplay() {
+            console.log('🔄 Updating personal user display...');
+            
+            // Cek localStorage
+            const userDataString = localStorage.getItem('currentUser');
+            console.log('📦 Raw localStorage data:', userDataString);
+            
+            if (!userDataString) {
+                console.log('❌ No current user found in localStorage');
+                // Set default untuk testing lokal
+                const testElement = document.getElementById('personalUserDisplay');
+                if (testElement) {
+                    testElement.textContent = 'Data: Test User (No Login Data)';
+                    testElement.style.color = 'red';
+                }
+                return;
+            }
+            
+            const currentUser = JSON.parse(userDataString);
+            console.log('👤 Parsed user data:', currentUser);
+            console.log('🔍 Available fields:', Object.keys(currentUser));
+            console.log('📝 full_name:', currentUser.full_name);
+            console.log('📝 username:', currentUser.username);
+            console.log('📝 email:', currentUser.email);
+            console.log('📝 name:', currentUser.name);
+            console.log('📝 id:', currentUser.id);
+            
+            const personalUserDisplay = document.getElementById('personalUserDisplay');
+            if (personalUserDisplay) {
+                // Coba berbagai kemungkinan field name
+                const displayName = 
+                    currentUser.full_name || 
+                    currentUser.username || 
+                    currentUser.name ||    // <-- TAMBAH INI untuk field 'name' yang ada
+                    currentUser.email ||
+                    `User ID: ${currentUser.id}` ||
+                    'Unknown User';
+                    
+                personalUserDisplay.textContent = `Data: ${displayName}`;
+                personalUserDisplay.style.color = ''; // reset color
+                console.log('✅ Personal user display updated to:', personalUserDisplay.textContent);
+                
+                // Debug tambahan - tampilkan semua field yang tersedia
+                console.log('🎯 Final display name selected:', displayName);
+                console.log('📊 All user fields:', JSON.stringify(currentUser, null, 2));
+            } else {
+                console.log('❌ personalUserDisplay element not found');
+            }
+        }
+
+        // Panggil function ini setelah DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded, calling updatePersonalUserDisplay');
+            setTimeout(updatePersonalUserDisplay, 100);
+            
+            // Multiple attempts untuk memastikan update
+            setTimeout(updatePersonalUserDisplay, 500);
+            setTimeout(updatePersonalUserDisplay, 1000);
+            setTimeout(updatePersonalUserDisplay, 2000);
+        });
+
+        // Juga jalankan saat window load
+        window.addEventListener('load', function() {
+            console.log('🪟 Window loaded, calling updatePersonalUserDisplay');
+            updatePersonalUserDisplay();
+        });
+
+        // Force update setiap 3 detik (untuk testing)
+        setInterval(function() {
+            const element = document.getElementById('personalUserDisplay');
+            if (element && element.textContent === 'Data: User') {
+                console.log('🔄 Auto-updating stuck personalUserDisplay...');
+                updatePersonalUserDisplay();
+            }
+        }, 3000);
+
+        // Fungsi utama untuk update profile avatars
+        function updateProfileAvatars(user) {
+            if (!user) {
+                console.log('❌ No user data provided for profile avatar update');
+                return;
+            }
+            
+            const profileElements = document.querySelectorAll('#profileAvatar');
+            console.log(`🖼️ Found ${profileElements.length} profile avatar elements`);
+            
+            profileElements.forEach((profileAvatar, index) => {
+                // Cek field foto profil yang benar berdasarkan struktur database
+                const profilePicture = user.photo_url;
+                
+                console.log(`🔍 Profile picture check for element ${index}:`, {
+                    photo_url: user.photo_url,
+                    finalPicture: profilePicture,
+                    element: profileAvatar
+                });
+                
+                if (profilePicture && profilePicture.trim() !== '') {
+                    console.log(`✅ Setting profile picture for element ${index}:`, profilePicture);
+                    
+                    // Hapus background gradient dulu
+                    profileAvatar.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
+                    
+                    // Set gambar dengan error handling
+                    profileAvatar.innerHTML = `<img src="${profilePicture}" alt="Foto Profil" class="w-8 h-8 object-cover rounded-full" 
+                        onload="console.log('🖼️ Profile image loaded successfully for element ${index}')"
+                        onerror="console.log('❌ Profile image failed to load for element ${index}'); this.parentElement.innerHTML='<i class=\\'fas fa-user text-white text-sm\\'></i>'; this.parentElement.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');">`;
+                    
+                } else {
+                    console.log(`⚠️ No profile picture found for element ${index}, using default icon`);
+                    profileAvatar.innerHTML = `<i class="fas fa-user text-white text-sm"></i>`;
+                    profileAvatar.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-cyan-500');
+                }
+            });
+        }
+        
+        // Listen for storage changes (untuk sync antar tab)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'currentUser') {
+                console.log('🔄 User data updated in another tab, refreshing profile picture...');
+                refreshProfilePicture();
+            }
+        });
+        
+        // Refresh user data from database (optional - jika diperlukan)
+        async function refreshUserDataFromDB() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser || !currentUser.id) return;
+            
+            try {
+                // Ambil data user terbaru dari database
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('id, full_name, email, username, profile_picture, role, is_active')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (!error && userData) {
+                    // Update localStorage dengan data terbaru
+                    const updatedUser = { ...currentUser, ...userData };
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    
+                    console.log('🔄 User data refreshed from database:', updatedUser);
+                    updateProfileAvatars(updatedUser);
+                } else {
+                    console.log('⚠️ Could not refresh user data:', error?.message || error);
+                    if (error?.code === '42703') {
+                        console.log('💡 Database column error - this is fixed now');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error refreshing user data:', error);
+                
+                // Fallback: gunakan data yang ada di localStorage
+                const existingUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (existingUser) {
+                    console.log('🔄 Using existing localStorage data as fallback');
+                    updateProfileAvatars(existingUser);
+                }
+            }
+        }            // Initialize charts
             setTimeout(() => {
                 initializeCharts();
             }, 100);
@@ -1152,6 +1914,7 @@ if (categoriesBtn) {
 } else {
     console.log('❌ Categories button not found');
 }
+
                 // Profile button click handler
                 if (profileBtn && profileDropdown) {
                     profileBtn.addEventListener('click', function(e) {
@@ -1207,6 +1970,28 @@ if (categoriesBtn) {
                                 break;
                             case 'Pengaturan':
                                 alert('Fitur Pengaturan akan segera hadir!');
+                                break;
+                            case 'Refresh Profile':
+                                console.log('🔄 Manual profile refresh requested...');
+                                
+                                // Show loading state
+                                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Refreshing...';
+                                
+                                // Update avatar dengan data saat ini dulu
+                                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                                updateProfileAvatars(currentUser);
+                                
+                                // Kemudian refresh dari database
+                                refreshUserDataFromDB().then(() => {
+                                    // Reset button text
+                                    setTimeout(() => {
+                                        this.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Refresh Profile';
+                                        
+                                        // Update sekali lagi setelah data dari DB
+                                        const updatedUser = JSON.parse(localStorage.getItem('currentUser'));
+                                        updateProfileAvatars(updatedUser);
+                                    }, 1500);
+                                });
                                 break;
                             case 'Notifikasi':
                                 alert('Fitur Notifikasi akan segera hadir!');
@@ -1270,7 +2055,122 @@ if (categoriesBtn) {
             // Load dashboard data
             loadDashboardData();
             
+            // Refresh user data dari database (untuk memastikan foto profil terbaru)
+            setTimeout(() => {
+                refreshUserDataFromDB();
+            }, 1000);
+            
             console.log('✅ Dashboard initialized successfully');
+            
+            // Debug functions - tersedia di console browser
+            window.debugUser = function() {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                console.log('👤 Current User Data:', user);
+                return user;
+            };
+            
+            window.refreshProfile = function() {
+                console.log('🔄 Manual profile refresh...');
+                refreshUserDataFromDB();
+            };
+            
+            window.updatePersonalDisplay = function() {
+                console.log('🔄 Manual personal display update...');
+                updatePersonalUserDisplay();
+            };
+            
+            window.updateAllDisplays = function() {
+                console.log('🔄 Manual all displays update...');
+                updateAllUserDisplays();
+            };
+            
+            window.updateAvatars = function() {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                console.log('🔄 Manual avatar update...');
+                updateProfileAvatars(user);
+            };
+            
+            window.testProfilePicture = function() {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                const profilePicture = user.profile_picture || user.photo_url || user.avatar || user.profile_image;
+                console.log('🖼️ Profile Picture URL:', profilePicture);
+                console.log('🔍 User Profile Data:', {
+                    profile_picture: user.profile_picture,
+                    photo_url: user.photo_url,
+                    avatar: user.avatar,
+                    profile_image: user.profile_image
+                });
+                
+                if (profilePicture) {
+                    console.log('🧪 Testing image load...');
+                    const img = new Image();
+                    img.onload = () => {
+                        console.log('✅ Image loads successfully');
+                        console.log('📏 Image dimensions:', img.width + 'x' + img.height);
+                    };
+                    img.onerror = () => {
+                        console.log('❌ Image failed to load');
+                        console.log('🔗 URL that failed:', profilePicture);
+                    };
+                    img.src = profilePicture;
+                } else {
+                    console.log('⚠️ No profile picture URL found');
+                }
+                return profilePicture;
+            };
+            
+            window.forceUpdateAvatar = function() {
+                console.log('💪 Force updating all profile avatars...');
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                console.log('User data:', user);
+                
+                // Update semua avatar dengan force
+                const avatars = document.querySelectorAll('#profileAvatar');
+                console.log('Found avatars:', avatars.length);
+                
+                avatars.forEach((avatar, index) => {
+                    console.log(`Updating avatar ${index}:`, avatar);
+                    updateProfileAvatars(user);
+                });
+            };
+            
+            // Tambahkan immediate test saat page load
+            setTimeout(() => {
+                console.log('🧪 Running immediate profile picture test...');
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                
+                if (user) {
+                    console.log('👤 Current user:', user.username || user.full_name);
+                    console.log('🔍 Profile fields check:', {
+                        profile_picture: user.profile_picture ? '✅ Found' : '❌ Not found',
+                        photo_url: user.photo_url ? '✅ Found' : '❌ Not found', 
+                        avatar: user.avatar ? '✅ Found' : '❌ Not found',
+                        profile_image: user.profile_image ? '✅ Found' : '❌ Not found'
+                    });
+                    
+                    const finalUrl = user.profile_picture || user.photo_url || user.avatar || user.profile_image;
+                    console.log('🖼️ Final URL to use:', finalUrl);
+                    
+                    if (finalUrl) {
+                        console.log('✅ Profile picture URL found, attempting to display...');
+                    } else {
+                        console.log('⚠️ No profile picture URL found - will show default icon');
+                        // Optional: Show notification to user
+                        // alert('Foto profil tidak ditemukan. Silakan upload foto profil di halaman Profile.');
+                    }
+                    
+                    const avatarElements = document.querySelectorAll('#profileAvatar');
+                    console.log(`🎯 Found ${avatarElements.length} avatar elements to update`);
+                    
+                    // Force update sekali lagi
+                    updateProfileAvatars(user);
+                    
+                } else {
+                    console.log('❌ No user data found in localStorage');
+                }
+            }, 2000);
+            
+            console.log('🛠️ Debug functions available: debugUser(), refreshProfile(), testProfilePicture(), updateAvatars(), forceUpdateAvatar()');
         });
         
         console.log('✅ Clean dashboard script loaded');

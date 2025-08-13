@@ -161,16 +161,47 @@
                 } else {
                     showSuccess('Login berhasil! love you aya');
                     if (data && data.user) {
-    const uuid = data.user.id.split(':')[0];
-    const name = data.user.user_metadata?.username || data.user.email;
-    localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
+                        // Extract user info from Supabase response
+                        const user = data.user;
+                        const uuid = user.id.split(':')[0];
+                        
+                        // Fetch complete user data from users table
+                        const { data: dbUser, error: dbError } = await supabase
+                            .from('users')
+                            .select('*')
+                            .eq('id', uuid)
+                            .single();
+                        
+                        let userData;
+                        if (dbError || !dbUser) {
+                            console.warn('Could not fetch user data from database:', dbError?.message);
+                            // Fallback to auth metadata
+                            userData = {
+                                id: uuid, 
+                                email: user.email,
+                                username: user.user_metadata?.username || user.email?.split('@')[0],
+                                full_name: user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0]
+                            };
+                        } else {
+                            // Use complete database data
+                            userData = {
+                                id: dbUser.id,
+                                email: dbUser.email || user.email,
+                                username: dbUser.username,
+                                full_name: dbUser.full_name,
+                                photo_url: dbUser.photo_url,
+                                create_at: dbUser.create_at
+                            };
+                        }
+                        
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
 
-    // Show modal
-    document.getElementById('loginSuccessModal').style.display = 'flex';
-    document.getElementById('loveYouBtn').onclick = function() {
-        window.location.href = 'dashboard.html';
-    };
-}
+                        // Show modal
+                        document.getElementById('loginSuccessModal').style.display = 'flex';
+                        document.getElementById('loveYouBtn').onclick = function() {
+                            window.location.href = 'dashboard.html';
+                        };
+                    }
                 }
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');
