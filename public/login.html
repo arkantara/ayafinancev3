@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ayaFinance</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><rect x='20' y='35' width='60' height='30' rx='5' fill='white'/><rect x='25' y='40' width='50' height='20' rx='3' fill='%233B82F6'/></svg>" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Suppress Tailwind CDN warning -->
+    <script>
+        // Override console.warn to hide Tailwind CDN warning in production
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+                // Skip Tailwind CDN warning
+                return;
+            }
+            originalWarn.apply(console, args);
+        };
+        
+        // Set production detection
+        window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    </script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center min-h-screen">
     <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md mx-4 border border-gray-100">
@@ -88,11 +105,25 @@
     </div> -->
 
     <script>
-        // Ganti URL dan anon key dengan milik Anda dari dashboard Supabase
-        const supabase = window.supabase.createClient(
-            'https://jjieqhvfadoqkahpqdvl.supabase.co', // Ganti dengan URL project Anda
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'                 // Ganti dengan anon key Anda
-        );
+        // Initialize Supabase client using Railway environment variables
+        let supabase;
+        
+        // Railway will inject environment variables via server.js
+        const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+        const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
+        
+        // Only show detailed logs in development (using window.IS_PRODUCTION from CSS script)
+        if (!window.IS_PRODUCTION) {
+            console.log('🚂 Initializing Supabase for Railway deployment...');
+            console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
+            console.log('🔑 Supabase Key configured:', !!supabaseKey);
+            console.log('🌍 Environment variables from Railway:', {
+                url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
+                key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
+            });
+        }
+        
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function showLoading(isLoading) {
             const submitBtn = document.getElementById('submitBtn');
