@@ -592,13 +592,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-// Initialize Supabase client - Vercel Static Deployment Version
-const supabaseUrl = window.SUPABASE_URL || 'https://hhqhzryyfkmxbqkxqnif.supabase.co';
-const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhocWh6cnl5ZmtteGJxa3hxbmlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1MjM2MjQsImV4cCI6MjA0ODA5OTYyNH0.UPEFj6_dPOFMBD5JlzPQ_PiSy4q9KkI5oBm5Cp8Eez0';
+// Initialize Supabase client using Railway environment variables
+const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
 
-console.log('🌐 Dashboard initializing for Vercel deployment...');
-console.log('📍 Supabase URL:', supabaseUrl.substring(0, 30) + '...');
+console.log('🚂 Dashboard initializing with Railway environment variables...');
+console.log('📍 Supabase URL:', supabaseUrl);
 console.log('🔑 Supabase Key configured:', !!supabaseKey);
+console.log('🌍 Environment source:', {
+    url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
+    key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
+});
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
