@@ -69,7 +69,21 @@
     let currentUser;
     
     try {
-        supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
+        // Initialize Supabase client using environment variables from Railway
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseKey = window.SUPABASE_KEY;
+        
+        if (!supabaseUrl || !supabaseKey) {
+            console.error('❌ Missing Supabase configuration. Please check environment variables.');
+            alert('Konfigurasi sistem tidak lengkap. Silakan hubungi administrator.');
+            throw new Error('Missing Supabase configuration');
+        }
+        
+        console.log('🚂 Profil using Railway environment variables');
+        console.log('📍 Supabase URL:', supabaseUrl.substring(0, 30) + '...');
+        console.log('🔑 Supabase Key configured:', !!supabaseKey);
+        
+        supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
         console.log('✅ Supabase client initialized');
         
         currentUser = JSON.parse(localStorage.getItem('currentUser'));
