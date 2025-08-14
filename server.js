@@ -28,13 +28,21 @@ app.use((req, res, next) => {
         // Inject environment variables di script tag
         if (processedHtml.includes('<script>')) {
           const isProduction = process.env.NODE_ENV === 'production';
-          const supabaseUrl = process.env.SUPABASE_URL;
-          const supabaseKey = process.env.SUPABASE_KEY;
+          const isDevelopment = process.env.NODE_ENV !== 'production';
           
-          // Validasi environment variables
-          if (!supabaseUrl || !supabaseKey) {
-            console.error('❌ Missing Supabase environment variables');
-            console.error('💡 Make sure SUPABASE_URL and SUPABASE_KEY are set in Railway');
+          let supabaseUrl = process.env.SUPABASE_URL;
+          let supabaseKey = process.env.SUPABASE_KEY;
+          
+          // Only provide fallback in development
+          if (isDevelopment && (!supabaseUrl || !supabaseKey)) {
+            console.log('🔧 Development mode: Using fallback credentials');
+            supabaseUrl = supabaseUrl || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+            supabaseKey = supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
+          }
+          
+          // Production: Strict validation
+          if (isProduction && (!supabaseUrl || !supabaseKey)) {
+            console.error('❌ Missing Supabase environment variables in production');
             return res.status(500).send('Server configuration error. Please contact administrator.');
           }
           
