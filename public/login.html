@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ayaFinance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS Loading Strategy -->
+    <script>
+        // Production CSS for better performance
+        window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        
+        if (window.IS_PRODUCTION) {
+            // Load production CSS
+            const prodCSS = document.createElement('link');
+            prodCSS.rel = 'stylesheet';
+            prodCSS.href = 'production.css';
+            document.head.appendChild(prodCSS);
+        } else {
+            // Load Tailwind CDN for development
+            const tailwindCSS = document.createElement('script');
+            tailwindCSS.src = 'https://cdn.tailwindcss.com';
+            document.head.appendChild(tailwindCSS);
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center min-h-screen">
@@ -95,13 +112,16 @@
         const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
         const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
         
-        console.log('🚂 Initializing Supabase for Railway deployment...');
-        console.log('📍 Supabase URL:', supabaseUrl);
-        console.log('🔑 Supabase Key configured:', !!supabaseKey);
-        console.log('🌍 Environment variables from Railway:', {
-            url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
-            key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
-        });
+        // Only show detailed logs in development (using window.IS_PRODUCTION from CSS script)
+        if (!window.IS_PRODUCTION) {
+            console.log('🚂 Initializing Supabase for Railway deployment...');
+            console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
+            console.log('🔑 Supabase Key configured:', !!supabaseKey);
+            console.log('🌍 Environment variables from Railway:', {
+                url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
+                key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
+            });
+        }
         
         supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 

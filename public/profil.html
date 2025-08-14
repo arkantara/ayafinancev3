@@ -74,7 +74,7 @@
         const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
         
         console.log('🚂 Profil initializing with Railway environment variables...');
-        console.log('📍 Supabase URL:', supabaseUrl);
+        console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
         console.log('🔑 Supabase Key configured:', !!supabaseKey);
         console.log('🌍 Environment source:', {
             url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
