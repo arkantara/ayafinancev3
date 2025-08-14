@@ -4,9 +4,25 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard - ayaFinance</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><rect x='20' y='35' width='60' height='30' rx='5' fill='white'/><rect x='25' y='40' width='50' height='20' rx='3' fill='%233B82F6'/></svg>" type="image/svg+xml">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        
+        <!-- Suppress Tailwind CDN warning -->
+        <script>
+            // Override console.warn to hide Tailwind CDN warning in production
+            const originalWarn = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+                    return; // Skip Tailwind CDN warning
+                }
+                originalWarn.apply(console, args);
+            };
+            
+            // Set production detection
+            window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        </script>
         
         <!-- ADD MOBILE RESPONSIVE CSS -->
         <style>
