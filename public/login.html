@@ -93,24 +93,23 @@
             <p class="text-xs text-gray-500">
                 <a href="#" class="hover:text-blue-600">Lupa password?</a>
             </p>
-        </div> -->
-
-        <!-- Demo Credentials 
-        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">🎯 Demo Credentials:</h4>
-            <div class="text-xs text-gray-600 space-y-1">
-                <p><strong>Email:</strong> test@example.com | <strong>Password:</strong> password</p>
-            </div>
         </div>
-    </div> -->
+    </div>
 
     <script>
-        // Initialize Supabase client using Railway environment variables
+        // Initialize Supabase client
         let supabase;
         
         // Railway will inject environment variables via server.js
-        const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
-        const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseKey = window.SUPABASE_KEY;
+        
+        // Production security check
+        if (!supabaseUrl || !supabaseKey) {
+            console.error('Configuration required. Please contact administrator.');
+            document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial;"><h2>Service Unavailable</h2><p>Please contact administrator.</p></div>';
+            return;
+        }
         
         // Only show detailed logs in development (using window.IS_PRODUCTION from CSS script)
         if (!window.IS_PRODUCTION) {
