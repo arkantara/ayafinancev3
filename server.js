@@ -1,81 +1,86 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
-const OpenAI = require('openai');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// ─── Manual CORS (handles both preflight & actual requests) ───
+// Serve static files dari folder public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware untuk inject environment variables ke HTML files
 app.use((req, res, next) => {
-  const FRONTEND_URL = 'https://ayafinancev3.vercel.app';
-  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
-  res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
-
-// ─── JSON body parsing ───
-app.use(express.json());
-
-// ─── Supabase client ───
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY);
-
-// ─── OpenAI client ───
-const openai = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
-  });
-
-// ─── Chat endpoint ───
-app.post('/api/chat', async (req, res) => {
-  // ─── LOGGING untuk debug ───
-  console.log('🔥 /api/chat called, body =', req.body);
-  console.log('   SUPABASE_URL=', process.env.SUPABASE_URL);
-  console.log('   SUPABASE_KEY present?', !!process.env.SUPABASE_KEY);
-  console.log('   GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
-
-  try {
-    const { message, userId } = req.body;
-
-    // … sisa kode Supabase + OpenAI-mu di sini …
-    let context = '';
-    if (/laporan|transaksi/i.test(message)) {
-      const { data: transactions, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', userId);
-      if (!error) context = `Data transaksi user: ${JSON.stringify(transactions)}`;
-    }
-
-    const prompt = context
-      ? `${context}\nUser: ${message}\nAI:`
-      : `User: ${message}\nAI:`;
-
-      const completion = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: '…' },
-          { role: 'user',   content: prompt }
-        ],
-        max_tokens: 500
-      });
+  // Hanya untuk file HTML
+  if (req.path.endsWith('.html')) {
+    const filePath = path.join(__dirname, 'public', req.path);
     
-      // pull out the string
-      const reply = completion.choices[0].message.content;
-      return res.json({ reply });
-
-  } catch (err) {
-    console.error('❌ Error in /api/chat:', err);
-    return res.status(500).json({ error: err.message || String(err) });
+    // Cek apakah file ada
+    if (fs.existsSync(filePath)) {
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          console.error('Error reading file:', err);
+          return next();
+        }
+        
+        // Replace environment variable placeholders  
+        let processedHtml = data;
+        
+        // Inject environment variables di script tag
+        if (processedHtml.includes('<script>')) {
+          const isProduction = process.env.NODE_ENV === 'production';
+          const supabaseUrl = process.env.SUPABASE_URL;
+          const supabaseKey = process.env.SUPABASE_KEY;
+          
+          // Validasi environment variables
+          if (!supabaseUrl || !supabaseKey) {
+            console.error('❌ Missing Supabase environment variables');
+            console.error('💡 Make sure SUPABASE_URL and SUPABASE_KEY are set in Railway');
+            return res.status(500).send('Server configuration error. Please contact administrator.');
+          }
+          
+          const envScript = `
+            <script>
+              // Environment variables from Railway
+              window.SUPABASE_URL = '${supabaseUrl}';
+              window.SUPABASE_KEY = '${supabaseKey}';
+              window.APP_ENV = '${isProduction ? 'production' : 'development'}';
+              console.log('🚂 Environment:', window.APP_ENV);
+              console.log('🔐 Supabase configured:', !!window.SUPABASE_URL && !!window.SUPABASE_KEY);
+            </script>
+          `;
+          
+          processedHtml = processedHtml.replace('<head>', `<head>${envScript}`);
+        }
+        
+        res.send(processedHtml);
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
   }
 });
 
-// ─── Start server pada port dari Railway ───
-const PORT = process.env.PORT || 8080;
+// Root route redirect ke dashboard
+app.get('/', (req, res) => {
+  res.redirect('/dashboard.html');
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    supabaseConfigured: !!process.env.SUPABASE_URL && !!process.env.SUPABASE_KEY
+  });
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 ayaFinance server running on port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔐 Supabase URL: ${process.env.SUPABASE_URL ? '✅ Configured' : '❌ Not configured'}`);
+  console.log(`🔑 Supabase Key: ${process.env.SUPABASE_KEY ? '✅ Configured' : '❌ Not configured'}`);
 });
