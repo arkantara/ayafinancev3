@@ -69,17 +69,11 @@
     let currentUser;
     
     try {
-        // Initialize Supabase client using environment variables from Railway
-        const supabaseUrl = window.SUPABASE_URL;
-        const supabaseKey = window.SUPABASE_KEY;
+        // Initialize Supabase client - Vercel Static Deployment Version
+        const supabaseUrl = window.SUPABASE_URL || 'https://hhqhzryyfkmxbqkxqnif.supabase.co';
+        const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhocWh6cnl5ZmtteGJxa3hxbmlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1MjM2MjQsImV4cCI6MjA0ODA5OTYyNH0.UPEFj6_dPOFMBD5JlzPQ_PiSy4q9KkI5oBm5Cp8Eez0';
         
-        if (!supabaseUrl || !supabaseKey) {
-            console.error('❌ Missing Supabase configuration. Please check environment variables.');
-            alert('Konfigurasi sistem tidak lengkap. Silakan hubungi administrator.');
-            throw new Error('Missing Supabase configuration');
-        }
-        
-        console.log('🚂 Profil using Railway environment variables');
+        console.log('🌐 Profil initializing for Vercel deployment...');
         console.log('📍 Supabase URL:', supabaseUrl.substring(0, 30) + '...');
         console.log('🔑 Supabase Key configured:', !!supabaseKey);
         
