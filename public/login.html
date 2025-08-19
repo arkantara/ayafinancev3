@@ -84,7 +84,7 @@
               <button id="loveYouBtn" style="background:#3b82f6; color:#fff; padding:0.5rem 1.5rem; border:none; border-radius:0.5rem; font-size:1rem;">i love you too</button>
             </div>
           </div>
-        <!-- Links 
+        <!-- Links -->
         <div class="mt-6 text-center space-y-2">
             <p class="text-sm text-gray-600">
                 Belum punya akun? 
@@ -122,7 +122,13 @@
             });
         }
         
-        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Wait for Supabase library to load then initialize
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('[INIT] Supabase client created successfully');
+        } else {
+            console.error('[INIT] Supabase library not loaded');
+        }
 
         function showLoading(isLoading) {
             const submitBtn = document.getElementById('submitBtn');
@@ -177,16 +183,33 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            console.log('[LOGIN] Starting login process...');
+            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            
+            console.log('[LOGIN] Email:', email);
+            console.log('[LOGIN] Supabase client initialized:', !!supabase);
+            
             if (!email || !password) {
                 showError('Silakan isi email dan password');
                 return;
             }
+            
+            if (!supabase) {
+                showError('Konfigurasi Supabase tidak ditemukan. Silakan refresh halaman.');
+                return;
+            }
+            
             showLoading(true);
             try {
+                console.log('[LOGIN] Attempting Supabase auth...');
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                
+                console.log('[LOGIN] Supabase response:', { data, error });
+                
                 if (error) {
+                    console.error('[LOGIN] Auth error:', error);
                     showError(error.message || 'Login gagal');
                 } else {
                     showSuccess('Login berhasil! love you aya');
@@ -234,24 +257,45 @@
                     }
                 }
             } catch (err) {
-                showError('Koneksi bermasalah. Silakan coba lagi.');
+                console.error('[LOGIN] Catch error:', err);
+                showError('Koneksi bermasalah: ' + (err.message || err.toString()));
             } finally {
                 showLoading(false);
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Cek jika sudah login
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                window.location.href = 'dashboard.html';
-                return;
+            // Wait for Supabase to be available
+            function initializeApp() {
+                if (typeof window.supabase === 'undefined') {
+                    console.log('[INIT] Waiting for Supabase library...');
+                    setTimeout(initializeApp, 100);
+                    return;
+                }
+                
+                // Initialize Supabase client
+                if (!supabase) {
+                    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                    console.log('[INIT] Supabase client initialized');
+                }
+                
+                // Cek jika sudah login
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                // Setup form event listener
+                const form = document.getElementById('loginForm');
+                if (form) {
+                    form.addEventListener('submit', handleLogin);
+                    console.log('[INIT] Login form event listener attached');
+                }
             }
-            // Setup form event listener
-            const form = document.getElementById('loginForm');
-            if (form) {
-                form.addEventListener('submit', handleLogin);
-            }
+            
+            initializeApp();
+            
             // Focus on first input
             const loginEmail = document.getElementById('loginEmail');
             if (loginEmail) loginEmail.focus();
