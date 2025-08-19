@@ -92,15 +92,6 @@ try {
   console.error('❌ Error loading budget routes:', error.message);
 }
 
-// Import dan gunakan route budgets
-try {
-  const budgetRoutes = require('./api/budgets');
-  app.use('/api/budgets', budgetRoutes);
-  console.log('✅ Budget routes loaded successfully');
-} catch (error) {
-  console.error('❌ Error loading budget routes:', error.message);
-}
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
