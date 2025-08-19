@@ -91,64 +91,85 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Budget API endpoints - langsung di index.js untuk Vercel compatibility
+
 app.get('/api/budgets/current', async (req, res) => {
   try {
     console.log('[Budget API] GET /api/budgets/current called');
-    const userId = req.query.user_id || 'demo-user';
     
-    // Return sample budget data untuk testing
+    // Get user dari Authorization header (Supabase JWT)
+    const authHeader = req.headers.authorization;
+    let userId = 'demo-user'; // fallback
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      // In real app, decode JWT untuk get user ID
+      userId = 'demo-user'; // Simplified untuk testing
+    }
+    
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
     
     const sampleBudgets = [
       { 
         id: '1', 
-        user_id: userId,
-        category: 'Makanan & Minuman', 
-        amount: 500000, 
-        actual_amount: 250000,
+        category_id: '1',
+        category_name: 'Makanan & Minuman',
+        category_icon: 'fas fa-utensils',
+        budget_amount: 500000, 
+        spent_amount: 250000,
+        remaining_amount: 250000,
         percentage_used: 50,
-        remaining: 250000,
         month: currentMonth,
         year: currentYear,
         status: 'safe'
       },
       { 
         id: '2', 
-        user_id: userId,
-        category: 'Transportasi', 
-        amount: 300000, 
-        actual_amount: 240000,
+        category_id: '2',
+        category_name: 'Transportasi',
+        category_icon: 'fas fa-car',
+        budget_amount: 300000, 
+        spent_amount: 240000,
+        remaining_amount: 60000,
         percentage_used: 80,
-        remaining: 60000,
         month: currentMonth,
         year: currentYear,
         status: 'warning'
       },
       { 
         id: '3', 
-        user_id: userId,
-        category: 'Hiburan', 
-        amount: 200000, 
-        actual_amount: 180000,
+        category_id: '3',
+        category_name: 'Hiburan',
+        category_icon: 'fas fa-gamepad',
+        budget_amount: 200000, 
+        spent_amount: 180000,
+        remaining_amount: 20000,
         percentage_used: 90,
-        remaining: 20000,
         month: currentMonth,
         year: currentYear,
         status: 'danger'
       }
     ];
 
+    const totalBudget = sampleBudgets.reduce((sum, b) => sum + b.budget_amount, 0);
+    const totalSpent = sampleBudgets.reduce((sum, b) => sum + b.spent_amount, 0);
+    const remainingBudget = totalBudget - totalSpent;
+    const percentageUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+    
+    // Calculate days left in month
+    const today = new Date();
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const daysLeft = Math.max(0, lastDayOfMonth.getDate() - today.getDate());
+
     res.json({
-      success: true,
-      data: sampleBudgets,
+      budgets: sampleBudgets,
       month: currentMonth,
       year: currentYear,
       summary: {
-        total_budget: sampleBudgets.reduce((sum, b) => sum + b.amount, 0),
-        total_spent: sampleBudgets.reduce((sum, b) => sum + b.actual_amount, 0),
-        categories_count: sampleBudgets.length
+        totalBudget,
+        totalSpent,
+        remainingBudget,
+        percentageUsed,
+        daysLeft
       }
     });
   } catch (error) {
@@ -160,7 +181,7 @@ app.get('/api/budgets/current', async (req, res) => {
 app.post('/api/budgets/setup', async (req, res) => {
   try {
     console.log('[Budget API] POST /api/budgets/setup called');
-    const { user_id, budgets } = req.body;
+    const { budgets, month, year } = req.body;
     
     if (!budgets || !Array.isArray(budgets)) {
       return res.status(400).json({ error: 'Invalid budgets data' });
@@ -169,11 +190,11 @@ app.post('/api/budgets/setup', async (req, res) => {
     // Simulate saving budgets
     const results = budgets.map((budget, index) => ({
       id: `new-${index + 1}`,
-      user_id: user_id || 'demo-user',
-      category: budget.category,
-      amount: parseFloat(budget.amount) || 0,
-      month: new Date().getMonth() + 1,
-      year: new Date().getFullYear(),
+      category_id: budget.category_id,
+      budget_amount: parseFloat(budget.budget_amount) || 0,
+      alert_threshold: budget.alert_threshold || 80,
+      month: month || new Date().getMonth() + 1,
+      year: year || new Date().getFullYear(),
       created_at: new Date().toISOString(),
       action: 'created'
     }));
@@ -189,90 +210,47 @@ app.post('/api/budgets/setup', async (req, res) => {
   }
 });
 
-app.get('/api/budgets/categories', (req, res) => {
+app.get('/api/budgets/categories', async (req, res) => {
   try {
     console.log('[Budget API] GET /api/budgets/categories called');
-    res.json({
-      success: true,
-      data: [
-        'Makanan & Minuman',
-        'Transportasi', 
-        'Hiburan',
-        'Belanja',
-        'Tagihan',
-        'Kesehatan',
-        'Pendidikan',
-        'Lainnya'
-      ]
-    });
+    
+    // Ambil categories dari database Supabase
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('id, name, icon, color')
+      .eq('type', 'expense')
+      .order('name');
+
+    if (error) {
+      console.error('[Budget API] Error fetching categories from database:', error);
+      // Fallback categories jika database error
+      return res.json([
+        { id: '1', name: 'Makanan & Minuman', icon: 'fas fa-utensils' },
+        { id: '2', name: 'Transportasi', icon: 'fas fa-car' },
+        { id: '3', name: 'Hiburan', icon: 'fas fa-gamepad' },
+        { id: '4', name: 'Belanja', icon: 'fas fa-shopping-bag' },
+        { id: '5', name: 'Tagihan', icon: 'fas fa-receipt' },
+        { id: '6', name: 'Kesehatan', icon: 'fas fa-heartbeat' },
+        { id: '7', name: 'Pendidikan', icon: 'fas fa-graduation-cap' },
+        { id: '8', name: 'Lainnya', icon: 'fas fa-ellipsis-h' }
+      ]);
+    }
+
+    // Format response dengan fallback icon jika tidak ada
+    const formattedCategories = categories?.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon || 'fas fa-folder',
+      color: cat.color || '#6B7280'
+    })) || [];
+
+    console.log('[Budget API] Categories loaded from database:', formattedCategories.length);
+    res.json(formattedCategories);
+    
   } catch (error) {
     console.error('[Budget API] Error in /categories:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
-});
-
-// Simple budget endpoints directly in index.js untuk debugging
-app.get('/api/budgets/current', async (req, res) => {
-  try {
-    console.log('[Budget] /current endpoint called');
-    const userId = req.query.user_id;
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID required' });
-    }
-
-    // Return sample budget data untuk testing
-    res.json({
-      success: true,
-      data: [
-        { 
-          id: '1', 
-          category: 'Makanan & Minuman', 
-          amount: 500000, 
-          actual_amount: 250000,
-          percentage_used: 50,
-          remaining: 250000,
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear()
-        },
-        { 
-          id: '2', 
-          category: 'Transportasi', 
-          amount: 300000, 
-          actual_amount: 150000,
-          percentage_used: 50,
-          remaining: 150000,
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear()
-        }
-      ],
-      month: new Date().getMonth() + 1,
-      year: new Date().getFullYear(),
-      summary: {
-        total_budget: 800000,
-        total_spent: 400000,
-        categories_count: 2
-      }
-    });
-  } catch (error) {
-    console.error('[Budget] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.get('/api/budgets/categories', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      'Makanan & Minuman',
-      'Transportasi', 
-      'Hiburan',
-      'Belanja',
-      'Tagihan',
-      'Kesehatan',
-      'Pendidikan',
-      'Lainnya'
-    ]
-  });
 });
 
 // Import dan gunakan route transaksi
