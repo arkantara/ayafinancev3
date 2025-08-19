@@ -258,15 +258,24 @@
             try {
                 showLoading(true);
 
-                // Load categories
-                const { data: categoriesData, error: categoriesError } = await supabaseClient
-                    .from('categories')
-                    .select('*')
-                    .eq('type', 'expense')
-                    .order('name');
-
-                if (categoriesError) throw categoriesError;
-                categories = categoriesData;
+                // Load categories from API
+                const response = await fetch('/api/budgets/categories');
+                if (response.ok) {
+                    categories = await response.json();
+                    console.log('[Budget] Categories loaded:', categories);
+                } else {
+                    // Fallback categories
+                    categories = [
+                        { id: '1', name: 'Makanan & Minuman', icon: 'fas fa-utensils' },
+                        { id: '2', name: 'Transportasi', icon: 'fas fa-car' },
+                        { id: '3', name: 'Hiburan', icon: 'fas fa-gamepad' },
+                        { id: '4', name: 'Belanja', icon: 'fas fa-shopping-bag' },
+                        { id: '5', name: 'Tagihan', icon: 'fas fa-receipt' },
+                        { id: '6', name: 'Kesehatan', icon: 'fas fa-heartbeat' },
+                        { id: '7', name: 'Pendidikan', icon: 'fas fa-graduation-cap' },
+                        { id: '8', name: 'Lainnya', icon: 'fas fa-ellipsis-h' }
+                    ];
+                }
 
                 // Load current budget data
                 await loadCurrentBudget();
@@ -298,11 +307,11 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to load budget');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
+                console.log('[Budget] API Response:', data);
                 budgetData = data;
 
                 if (data.budgets && data.budgets.length > 0) {
@@ -317,8 +326,8 @@
                     showElement('emptyState');
                 }
 
-                // Load and display alerts
-                await loadBudgetAlerts();
+                // Load and display alerts (optional untuk sekarang)
+                // await loadBudgetAlerts();
             } catch (error) {
                 console.error('Error loading current budget:', error);
                 showAlert('Gagal memuat budget: ' + error.message, 'error');
@@ -727,14 +736,16 @@
                     })
                 });
 
-                if (response.ok) {
-                    showAlert('Budget berhasil disimpan!', 'success');
-                    closeBudgetModal();
-                    await loadCurrentBudget();
-                } else {
-                    const errorData = await response.json();
-                    showAlert('Gagal menyimpan budget: ' + errorData.error, 'error');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+
+                const result = await response.json();
+                console.log('[Budget] Save result:', result);
+                
+                showAlert('Budget berhasil disimpan!', 'success');
+                closeBudgetModal();
+                await loadCurrentBudget();
             } catch (error) {
                 console.error('Error saving budget:', error);
                 showAlert('Gagal menyimpan budget: ' + error.message, 'error');
