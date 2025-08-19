@@ -2,47 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
-const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Environment variable injection middleware for specific HTML files
-const htmlFiles = ['dashboard.html', 'budget.html', 'login.html', 'register.html', 'transactions.html', 'profil.html'];
-
-htmlFiles.forEach(filename => {
-  app.get('/' + filename, (req, res) => {
-    const filePath = path.join(__dirname, 'public', filename);
-    
-    // Check if file exists
-    const fs = require('fs');
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send('File not found');
-    }
-
-    let html = fs.readFileSync(filePath, 'utf8');
-    
-    // Inject environment variables
-    const envScript = `
-    <script>
-      window.SUPABASE_URL = '${process.env.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co'}';
-      window.SUPABASE_KEY = '${process.env.SUPABASE_KEY || ''}';
-      window.SUPABASE_ANON_KEY = '${process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0'}';
-      console.log('[Config] Environment variables loaded');
-    </script>
-  `;
-    
-    // Insert before closing head tag
-    html = html.replace('</head>', envScript + '</head>');
-    
-    res.setHeader('Content-Type', 'text/html');
-    res.send(html);
-  });
-});
 
 const pool = new Pool({
   host: 'aws-0-ap-southeast-1.pooler.supabase.com',
@@ -72,23 +35,26 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+const express = require('express');
+app = express();
+app.use(express.json());
+
 // Import dan gunakan route transaksi
 const transactionRoutes = require('./api/transactions');
 app.use('/api/transactions', transactionRoutes);
 
-// Import dan gunakan route auth
+app.listen(3000, () => console.log('Server running on port 3000'));
+
+const express = require('express');
+app = express();
+app.use(express.json());
+
 const authRoutes = require('./api/auth');
 app.use('/api/auth', authRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
+app.listen(3000, () => console.log('Server running on port 3000'));
 
-// Redirect root to dashboard
-app.get('/', (req, res) => {
-  res.redirect('/dashboard.html');
-});
+// Endpoint lain: register, transaksi, dsb...
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
