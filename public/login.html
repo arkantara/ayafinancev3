@@ -11,15 +11,19 @@
     
     <!-- Suppress Tailwind CDN warning -->
     <script>
-        // Override console.warn to hide Tailwind CDN warning in production
-        const originalWarn = console.warn;
-        console.warn = function(...args) {
-            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
-                // Skip Tailwind CDN warning
-                return;
-            }
-            originalWarn.apply(console, args);
-        };
+        // Override console.warn to hide Tailwind CDN warning
+        (function() {
+            const originalWarn = console.warn;
+            console.warn = function(...args) {
+                // Filter out Tailwind CDN warning
+                if (args[0] && typeof args[0] === 'string' && 
+                    (args[0].includes('cdn.tailwindcss.com') || 
+                     args[0].includes('should not be used in production'))) {
+                    return; // Skip this warning
+                }
+                originalWarn.apply(console, args);
+            };
+        })();
         
         // Set production detection
         window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
@@ -102,13 +106,14 @@
         
         // Try to get injected environment variables (from server-side) or use fallback (for static deployment)
         const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
-        const supabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0';
+        // Use SUPABASE_KEY (Railway env var) instead of SUPABASE_ANON_KEY
+        const supabaseKey = window.SUPABASE_KEY || window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0';
         
         // Production security check - only require in production
-        if (window.IS_PRODUCTION && (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY)) {
+        if (window.IS_PRODUCTION && (!window.SUPABASE_URL || (!window.SUPABASE_KEY && !window.SUPABASE_ANON_KEY))) {
             console.error('Production configuration required. Please contact administrator.');
             document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial;"><h2>Service Unavailable</h2><p>Please contact administrator.</p></div>';
-            return;
+            throw new Error('Production configuration missing');
         }
         
         // Only show detailed logs in development
@@ -118,7 +123,7 @@
             console.log('🔑 Supabase Key configured:', !!supabaseKey);
             console.log('🌍 Environment variables:', {
                 url: !!window.SUPABASE_URL ? 'Injected' : 'Fallback',
-                key: !!window.SUPABASE_ANON_KEY ? 'Injected' : 'Fallback'
+                key: !!window.SUPABASE_KEY ? 'Railway SUPABASE_KEY' : !!window.SUPABASE_ANON_KEY ? 'SUPABASE_ANON_KEY' : 'Fallback'
             });
         }
         
@@ -212,6 +217,17 @@
             try {
                 console.log('🚀 Attempting Supabase auth...');
                 console.log('📡 Making auth request to:', supabase?.supabaseUrl);
+                
+                // Test Supabase connection first
+                console.log('🔍 Testing Supabase connection...');
+                const testResponse = await fetch(supabaseUrl + '/rest/v1/', {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`
+                    }
+                });
+                console.log('🌐 Connection test status:', testResponse.status);
+                console.log('🌐 Connection test ok:', testResponse.ok);
                 
                 const authResult = await supabase.auth.signInWithPassword({ email, password });
                 
