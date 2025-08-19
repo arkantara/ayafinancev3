@@ -93,6 +93,10 @@ app.use('/api/transactions', transactionRoutes);
 const authRoutes = require('./api/auth');
 app.use('/api/auth', authRoutes);
 
+// Import dan gunakan route budgets
+const budgetRoutes = require('./api/budgets');
+app.use('/api/budgets', budgetRoutes);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
