@@ -91,6 +91,126 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Budget API endpoints - langsung di index.js untuk Vercel compatibility
+app.get('/api/budgets/current', async (req, res) => {
+  try {
+    console.log('[Budget API] GET /api/budgets/current called');
+    const userId = req.query.user_id || 'demo-user';
+    
+    // Return sample budget data untuk testing
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    
+    const sampleBudgets = [
+      { 
+        id: '1', 
+        user_id: userId,
+        category: 'Makanan & Minuman', 
+        amount: 500000, 
+        actual_amount: 250000,
+        percentage_used: 50,
+        remaining: 250000,
+        month: currentMonth,
+        year: currentYear,
+        status: 'safe'
+      },
+      { 
+        id: '2', 
+        user_id: userId,
+        category: 'Transportasi', 
+        amount: 300000, 
+        actual_amount: 240000,
+        percentage_used: 80,
+        remaining: 60000,
+        month: currentMonth,
+        year: currentYear,
+        status: 'warning'
+      },
+      { 
+        id: '3', 
+        user_id: userId,
+        category: 'Hiburan', 
+        amount: 200000, 
+        actual_amount: 180000,
+        percentage_used: 90,
+        remaining: 20000,
+        month: currentMonth,
+        year: currentYear,
+        status: 'danger'
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: sampleBudgets,
+      month: currentMonth,
+      year: currentYear,
+      summary: {
+        total_budget: sampleBudgets.reduce((sum, b) => sum + b.amount, 0),
+        total_spent: sampleBudgets.reduce((sum, b) => sum + b.actual_amount, 0),
+        categories_count: sampleBudgets.length
+      }
+    });
+  } catch (error) {
+    console.error('[Budget API] Error in /current:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+app.post('/api/budgets/setup', async (req, res) => {
+  try {
+    console.log('[Budget API] POST /api/budgets/setup called');
+    const { user_id, budgets } = req.body;
+    
+    if (!budgets || !Array.isArray(budgets)) {
+      return res.status(400).json({ error: 'Invalid budgets data' });
+    }
+
+    // Simulate saving budgets
+    const results = budgets.map((budget, index) => ({
+      id: `new-${index + 1}`,
+      user_id: user_id || 'demo-user',
+      category: budget.category,
+      amount: parseFloat(budget.amount) || 0,
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      created_at: new Date().toISOString(),
+      action: 'created'
+    }));
+
+    res.json({
+      success: true,
+      data: results,
+      message: `Successfully saved ${results.length} budget entries`
+    });
+  } catch (error) {
+    console.error('[Budget API] Error in /setup:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+app.get('/api/budgets/categories', (req, res) => {
+  try {
+    console.log('[Budget API] GET /api/budgets/categories called');
+    res.json({
+      success: true,
+      data: [
+        'Makanan & Minuman',
+        'Transportasi', 
+        'Hiburan',
+        'Belanja',
+        'Tagihan',
+        'Kesehatan',
+        'Pendidikan',
+        'Lainnya'
+      ]
+    });
+  } catch (error) {
+    console.error('[Budget API] Error in /categories:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
 // Simple budget endpoints directly in index.js untuk debugging
 app.get('/api/budgets/current', async (req, res) => {
   try {
