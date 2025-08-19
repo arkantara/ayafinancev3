@@ -30,6 +30,7 @@ htmlFiles.forEach(filename => {
     const envScript = `
     <script>
       window.SUPABASE_URL = '${process.env.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co'}';
+      window.SUPABASE_KEY = '${process.env.SUPABASE_KEY || ''}';
       window.SUPABASE_ANON_KEY = '${process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0'}';
       console.log('[Config] Environment variables loaded');
     </script>
