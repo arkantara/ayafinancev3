@@ -22,7 +22,7 @@
   ],
   "env": {
     "SUPABASE_URL": "https://jjieqhvfadoqkahpqdvl.supabase.co",
-    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0"
+    "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM"
   },
   "headers": [
     {
