@@ -8,6 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Environment variable validation untuk production
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_KEY'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
@@ -85,6 +91,70 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Simple budget endpoints directly in index.js untuk debugging
+app.get('/api/budgets/current', async (req, res) => {
+  try {
+    console.log('[Budget] /current endpoint called');
+    const userId = req.query.user_id;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    // Return sample budget data untuk testing
+    res.json({
+      success: true,
+      data: [
+        { 
+          id: '1', 
+          category: 'Makanan & Minuman', 
+          amount: 500000, 
+          actual_amount: 250000,
+          percentage_used: 50,
+          remaining: 250000,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear()
+        },
+        { 
+          id: '2', 
+          category: 'Transportasi', 
+          amount: 300000, 
+          actual_amount: 150000,
+          percentage_used: 50,
+          remaining: 150000,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear()
+        }
+      ],
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      summary: {
+        total_budget: 800000,
+        total_spent: 400000,
+        categories_count: 2
+      }
+    });
+  } catch (error) {
+    console.error('[Budget] Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/budgets/categories', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      'Makanan & Minuman',
+      'Transportasi', 
+      'Hiburan',
+      'Belanja',
+      'Tagihan',
+      'Kesehatan',
+      'Pendidikan',
+      'Lainnya'
+    ]
+  });
+});
+
 // Import dan gunakan route transaksi
 const transactionRoutes = require('./api/transactions');
 app.use('/api/transactions', transactionRoutes);
@@ -94,12 +164,22 @@ const authRoutes = require('./api/auth');
 app.use('/api/auth', authRoutes);
 
 // Import dan gunakan route budgets
-const budgetRoutes = require('./api/budgets');
-app.use('/api/budgets', budgetRoutes);
+try {
+  const budgetRoutes = require('./api/budgets');
+  app.use('/api/budgets', budgetRoutes);
+  console.log('✅ Budget routes loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading budget routes:', error.message);
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Test budget endpoint - VERY SIMPLE
+app.get('/test-budget', (req, res) => {
+  res.json({ message: 'Budget endpoint works!', timestamp: new Date().toISOString() });
 });
 
 // Redirect root to dashboard
