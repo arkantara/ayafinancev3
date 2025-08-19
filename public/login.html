@@ -183,13 +183,20 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            console.log('[LOGIN] Starting login process...');
+            console.log('=== LOGIN DEBUG INFO ===');
+            console.log('🌍 Current URL:', window.location.href);
+            console.log('🔧 Environment:', window.IS_PRODUCTION ? 'PRODUCTION' : 'DEVELOPMENT');
+            console.log('🔑 Supabase URL:', supabaseUrl);
+            console.log('🗝️ Supabase Key (first 20 chars):', supabaseKey?.substring(0, 20) + '...');
+            console.log('📚 Supabase library loaded:', typeof window.supabase !== 'undefined');
+            console.log('🎯 Supabase client created:', !!supabase);
             
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            console.log('[LOGIN] Email:', email);
-            console.log('[LOGIN] Supabase client initialized:', !!supabase);
+            console.log('📧 Email:', email);
+            console.log('🔒 Password length:', password?.length);
+            console.log('💾 LocalStorage available:', typeof localStorage !== 'undefined');
             
             if (!email || !password) {
                 showError('Silakan isi email dan password');
@@ -203,16 +210,30 @@
             
             showLoading(true);
             try {
-                console.log('[LOGIN] Attempting Supabase auth...');
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                console.log('🚀 Attempting Supabase auth...');
+                console.log('📡 Making auth request to:', supabase?.supabaseUrl);
                 
-                console.log('[LOGIN] Supabase response:', { data, error });
+                const authResult = await supabase.auth.signInWithPassword({ email, password });
                 
-                if (error) {
-                    console.error('[LOGIN] Auth error:', error);
-                    showError(error.message || 'Login gagal');
-                } else {
-                    showSuccess('Login berhasil! love you aya');
+                console.log('📬 Auth Response:');
+                console.log('  - Error:', authResult.error);
+                console.log('  - User ID:', authResult.data?.user?.id);
+                console.log('  - User Email:', authResult.data?.user?.email);
+                console.log('  - Session:', !!authResult.data?.session);
+                
+                if (authResult.error) {
+                    console.error('❌ Auth Error Details:');
+                    console.error('  - Message:', authResult.error.message);
+                    console.error('  - Status:', authResult.error.status);
+                    console.error('  - Details:', authResult.error);
+                    showError(`Login gagal: ${authResult.error.message}`);
+                    return;
+                }
+                
+                // Success path
+                const { data } = authResult;
+                console.log('✅ Login successful!');
+                showSuccess('Login berhasil! love you aya');
                     if (data && data.user) {
                         // Extract user info from Supabase response
                         const user = data.user;
@@ -255,12 +276,14 @@
                             window.location.href = 'dashboard.html';
                         };
                     }
-                }
             } catch (err) {
-                console.error('[LOGIN] Catch error:', err);
+                console.error('❌ Catch error:', err);
+                console.error('  - Message:', err.message);
+                console.error('  - Stack:', err.stack);
                 showError('Koneksi bermasalah: ' + (err.message || err.toString()));
             } finally {
                 showLoading(false);
+                console.log('🏁 Login process completed');
             }
         }
 
