@@ -614,13 +614,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-// Initialize Supabase client for production
-const supabaseUrl = window.SUPABASE_URL;
-const supabaseKey = window.SUPABASE_KEY;
+// Initialize Supabase client
+const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+const supabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0';
 
-// Production security check
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Configuration required. Please contact administrator.');
+// Production security check - only require in production
+if (window.IS_PRODUCTION && (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY)) {
+    console.error('Production configuration required. Please contact administrator.');
     document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial;"><h2>Service Unavailable</h2><p>Please contact administrator.</p></div>';
     throw new Error('Configuration missing');
 }

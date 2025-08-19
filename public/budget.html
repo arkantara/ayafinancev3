@@ -212,12 +212,12 @@
         // Initialize app
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Initialize Supabase (keys will be injected by server)
-                const supabaseUrl = window.SUPABASE_URL;
-                const supabaseKey = window.SUPABASE_ANON_KEY;
+                // Initialize Supabase (try injected environment or use fallback)
+                const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+                const supabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0';
                 
-                if (!supabaseUrl || !supabaseKey) {
-                    throw new Error('Supabase configuration not found');
+                if (window.IS_PRODUCTION && (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY)) {
+                    throw new Error('Production configuration required');
                 }
 
                 supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);

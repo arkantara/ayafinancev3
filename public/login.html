@@ -100,25 +100,25 @@
         // Initialize Supabase client
         let supabase;
         
-        // Railway will inject environment variables via server.js
-        const supabaseUrl = window.SUPABASE_URL;
-        const supabaseKey = window.SUPABASE_KEY;
+        // Try to get injected environment variables (from server-side) or use fallback (for static deployment)
+        const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+        const supabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub25fa2V5IiwiaWF0IjoxNzUyNTYxMTgxLCJleHAiOjIwNjgxMzcxODF9.VGCu8X9LQ2jZnGN6VzH2nO2FTbMgOzL0rDmQB5vR3Z0';
         
-        // Production security check
-        if (!supabaseUrl || !supabaseKey) {
-            console.error('Configuration required. Please contact administrator.');
+        // Production security check - only require in production
+        if (window.IS_PRODUCTION && (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY)) {
+            console.error('Production configuration required. Please contact administrator.');
             document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:Arial;"><h2>Service Unavailable</h2><p>Please contact administrator.</p></div>';
             return;
         }
         
-        // Only show detailed logs in development (using window.IS_PRODUCTION from CSS script)
+        // Only show detailed logs in development
         if (!window.IS_PRODUCTION) {
-            console.log('🚂 Initializing Supabase for Railway deployment...');
+            console.log('🚂 Initializing Supabase...');
             console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
             console.log('🔑 Supabase Key configured:', !!supabaseKey);
-            console.log('🌍 Environment variables from Railway:', {
-                url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
-                key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
+            console.log('🌍 Environment variables:', {
+                url: !!window.SUPABASE_URL ? 'Injected' : 'Fallback',
+                key: !!window.SUPABASE_ANON_KEY ? 'Injected' : 'Fallback'
             });
         }
         
