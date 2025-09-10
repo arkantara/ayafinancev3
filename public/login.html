@@ -17,21 +17,39 @@
         // Function to initialize Supabase
         async function initializeSupabase() {
             try {
+                console.log('🔄 Loading config from /config.js...');
+                
                 // Try to load config from server endpoint
                 const configResponse = await fetch('/config.js');
+                console.log('📡 Config response status:', configResponse.status);
+                console.log('📡 Config response ok:', configResponse.ok);
+                
                 if (configResponse.ok) {
                     const configText = await configResponse.text();
+                    console.log('📄 Config text received:', configText.substring(0, 200) + '...');
+                    
                     // Execute the config script to set window.ENV
                     eval(configText);
+                    console.log('💾 After eval, window.ENV:', window.ENV);
+                } else {
+                    console.error('❌ Config fetch failed with status:', configResponse.status);
                 }
                 
                 // Check if ENV is available
                 if (window.ENV && window.ENV.SUPABASE_URL && window.ENV.SUPABASE_KEY) {
+                    console.log('✅ Environment variables found:');
+                    console.log('  - SUPABASE_URL:', window.ENV.SUPABASE_URL ? 'SET' : 'NOT SET');
+                    console.log('  - SUPABASE_KEY:', window.ENV.SUPABASE_KEY ? 'SET' : 'NOT SET');
+                    console.log('  - PLATFORM:', window.ENV.PLATFORM);
+                    
                     supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
                     console.log('✅ Supabase client initialized successfully');
                     return true;
                 } else {
                     console.warn('⚠️ Environment variables not available, Supabase disabled');
+                    console.log('Debug info:');
+                    console.log('  - window.ENV exists:', !!window.ENV);
+                    console.log('  - window.ENV content:', window.ENV);
                     return false;
                 }
             } catch (error) {
