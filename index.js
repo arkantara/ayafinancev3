@@ -27,12 +27,19 @@ app.use(express.static('public'));
 
 // Inject environment variables ke HTML files
 app.get('/config.js', (req, res) => {
+  console.log('=== CONFIG.JS DEBUG ===');
+  console.log('SUPABASE_URL from env:', process.env.SUPABASE_URL ? 'SET' : 'NOT SET');
+  console.log('SUPABASE_KEY from env:', process.env.SUPABASE_KEY ? 'SET' : 'NOT SET');
+  console.log('Using URL:', supabaseUrl);
+  console.log('Platform:', process.env.VERCEL ? 'vercel' : (process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'local'));
+  
   res.setHeader('Content-Type', 'application/javascript');
   res.send(`
     window.ENV = {
       SUPABASE_URL: '${supabaseUrl}',
       SUPABASE_KEY: '${supabaseKey}',
-      IS_PRODUCTION: ${process.env.NODE_ENV === 'production'}
+      IS_PRODUCTION: ${process.env.NODE_ENV === 'production'},
+      PLATFORM: '${process.env.VERCEL ? 'vercel' : (process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'local')}'
     };
   `);
 });
@@ -242,7 +249,15 @@ app.delete('/api/notes/:id', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    env_check: {
+      has_supabase_url: !!process.env.SUPABASE_URL,
+      has_supabase_key: !!process.env.SUPABASE_KEY,
+      platform: process.env.VERCEL ? 'vercel' : (process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'local')
+    }
+  });
 });
 
 // Default route
