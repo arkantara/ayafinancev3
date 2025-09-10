@@ -41,7 +41,12 @@ app.get('/config.js', (req, res) => {
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
-  console.log('Login attempt:', { username });
+  console.log('=== LOGIN DEBUG ===');
+  console.log('Request body:', req.body);
+  console.log('Username:', username, 'Type:', typeof username);
+  console.log('Password:', password, 'Type:', typeof password);
+  console.log('Username includes @:', username ? username.includes('@') : 'false');
+  console.log('Password length:', password ? password.length : 0);
   
   // Simplified validation untuk testing - accept any valid credentials
   if (username && password && username.includes('@') && password.length >= 5) {
@@ -54,7 +59,11 @@ app.post('/api/login', (req, res) => {
     console.log('✅ Login successful for:', username);
     res.json({ success: true, message: 'Login berhasil', user });
   } else {
-    console.log('❌ Login failed - invalid credentials format');
+    console.log('❌ Login failed - validation details:');
+    console.log('  - Has username:', !!username);
+    console.log('  - Has password:', !!password);
+    console.log('  - Email format:', username ? username.includes('@') : false);
+    console.log('  - Password length OK:', password ? password.length >= 5 : false);
     res.json({ success: false, message: 'Email atau password tidak valid' });
   }
 });
