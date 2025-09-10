@@ -2,9 +2,6 @@ const express = require('express');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
-// Load environment variables from .env file
-require('dotenv').config();
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -94,9 +91,6 @@ try {
 } catch (error) {
   console.error('❌ Error loading budget routes:', error.message);
 }
-
-// Notes API now uses Vercel serverless format in api/notes/ folder
-// No need to register Express routes for Vercel deployment
 
 // Health check endpoint
 app.get('/health', (req, res) => {
