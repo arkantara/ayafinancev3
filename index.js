@@ -37,11 +37,11 @@ app.get('/config.js', (req, res) => {
   `);
 });
 
-// Login endpoint - simplified untuk testing
+// Login endpoint - API for authentication
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
-  console.log('=== LOGIN DEBUG ===');
+  console.log('=== LOGIN DEBUG v2 ===');
   console.log('Request body:', req.body);
   console.log('Username:', username, 'Type:', typeof username);
   console.log('Password:', password, 'Type:', typeof password);
