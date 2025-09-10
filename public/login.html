@@ -26,7 +26,8 @@
                 
                 if (configResponse.ok) {
                     const configText = await configResponse.text();
-                    console.log('📄 Config text received:', configText.substring(0, 200) + '...');
+                    console.log('📄 Config text received (full):', configText);
+                    console.log('📄 Config text length:', configText.length);
                     
                     // Execute the config script to set window.ENV
                     eval(configText);
