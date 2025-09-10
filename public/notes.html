@@ -418,10 +418,27 @@
 
     <!-- JavaScript -->
     <script>
+        // UUID Generator function
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         // Global variables
         let quill;
         let currentNote = null;
         let notes = [];
+        
+        // Initialize Supabase client (same as transactions)
+        const supabase = window.supabase.createClient(
+          'https://jjieqhvfadoqkahpqdvl.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'
+        );
+
+        console.log('🔍 Notes page script loading...');
 
         // Initialize Quill editor
         document.addEventListener('DOMContentLoaded', function() {
@@ -439,6 +456,14 @@
                     ]
                 }
             });
+            // Check authentication first
+            const currentUser = checkAuth();
+            if (!currentUser) {
+                // If no valid user, redirect to login
+                alert('Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
 
             // Load notes and initialize profile
             loadNotes();
@@ -724,30 +749,109 @@
         }
 
         // Note CRUD functions
-        function loadNotes() {
-            // Load notes from localStorage (in real app, this would be from API)
-            const savedNotes = localStorage.getItem('ayafinance_notes');
-            notes = savedNotes ? JSON.parse(savedNotes) : [];
+        async function loadNotes() {
+            try {
+                console.log('Loading notes from Supabase...');
+                
+                const { data: notesData, error } = await supabase
+                    .from('notes')
+                    .select('*')
+                    .order('updated_at', { ascending: false });
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    // Fallback to localStorage if Supabase fails
+                    const savedNotes = localStorage.getItem('ayafinance_notes');
+                    notes = savedNotes ? JSON.parse(savedNotes) : [];
+                } else {
+                    notes = notesData || [];
+                    console.log('Notes loaded from Supabase:', notes.length);
+                }
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                // Fallback to localStorage if error occurs
+                const savedNotes = localStorage.getItem('ayafinance_notes');
+                notes = savedNotes ? JSON.parse(savedNotes) : [];
+            }
             displayNotes(notes);
         }
 
-        function saveNote(noteData) {
-            if (currentNote) {
-                // Update existing note
-                const index = notes.findIndex(n => n.id === currentNote.id);
-                if (index !== -1) {
-                    notes[index] = { ...noteData, id: currentNote.id, updatedAt: new Date().toISOString() };
-                }
-            } else {
-                // Create new note
-                noteData.id = Date.now().toString();
-                noteData.createdAt = new Date().toISOString();
-                noteData.updatedAt = new Date().toISOString();
-                notes.unshift(noteData);
-            }
+        async function saveNote(noteData) {
+            console.log('=== SAVE NOTE DEBUG ===');
+            console.log('saveNote called with:', noteData);
             
-            localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
-            displayNotes(notes);
+            try {
+                if (currentNote) {
+                    // Update existing note using Supabase
+                    console.log('Updating note:', currentNote.id);
+                    
+                    const { data, error } = await supabase
+                        .from('notes')
+                        .update(noteData)
+                        .eq('id', currentNote.id)
+                        .select()
+                        .single();
+
+                    if (error) {
+                        console.error('Supabase update error:', error);
+                        throw new Error('Failed to update note: ' + error.message);
+                    }
+
+                    // Update local notes array
+                    const index = notes.findIndex(n => n.id === currentNote.id);
+                    if (index !== -1) {
+                        notes[index] = data;
+                    }
+                    console.log('Note updated successfully');
+                    
+                } else {
+                    // Create new note using Supabase
+                    console.log('Creating new note');
+                    
+                    const { data, error } = await supabase
+                        .from('notes')
+                        .insert([noteData])
+                        .select()
+                        .single();
+
+                    if (error) {
+                        console.error('Supabase insert error:', error);
+                        throw new Error('Failed to create note: ' + error.message);
+                    }
+
+                    // Add to local notes array
+                    notes.unshift(data);
+                    console.log('Note created successfully:', data);
+                }
+                
+                // Also save to localStorage as backup
+                localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
+                displayNotes(notes);
+                
+            } catch (error) {
+                console.error('=== SAVE ERROR DEBUG ===');
+                console.error('Error saving note:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                alert('Gagal menyimpan note. Menggunakan penyimpanan lokal sebagai backup.');
+                
+                // Fallback to localStorage
+                if (currentNote) {
+                    const index = notes.findIndex(n => n.id === currentNote.id);
+                    if (index !== -1) {
+                        notes[index] = { ...noteData, id: currentNote.id, updated_at: new Date().toISOString() };
+                    }
+                } else {
+                    noteData.id = generateUUID();
+                    noteData.created_at = new Date().toISOString();
+                    noteData.updated_at = new Date().toISOString();
+                    notes.unshift(noteData);
+                }
+                
+                localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
+                displayNotes(notes);
+            }
         }
 
         function displayNotes(notesToShow) {
@@ -773,7 +877,7 @@
                         ${note.type === 'table' ? 'Custom Table' : getPlainText(note.content).substring(0, 100) + '...'}
                     </div>
                     <div class="flex justify-between items-center text-xs text-gray-400">
-                        <span><i class="fas fa-calendar mr-1"></i>${new Date(note.createdAt).toLocaleDateString()}</span>
+                        <span><i class="fas fa-calendar mr-1"></i>${new Date(note.created_at).toLocaleDateString()}</span>
                         <div class="flex space-x-2">
                             <button onclick="editNoteById('${note.id}', event)" class="text-blue-500 hover:text-blue-700">
                                 <i class="fas fa-edit"></i>
@@ -810,7 +914,7 @@
             if (!note) return;
             
             document.getElementById('viewNoteTitle').textContent = note.title;
-            document.getElementById('viewNoteInfo').textContent = `${getCategoryName(note.category)} • ${new Date(note.createdAt).toLocaleDateString()}`;
+            document.getElementById('viewNoteInfo').textContent = `${getCategoryName(note.category)} • ${new Date(note.created_at).toLocaleDateString()}`;
             
             const contentDiv = document.getElementById('viewNoteContent');
             if (note.type === 'table') {
@@ -848,12 +952,37 @@
             editNote();
         }
 
-        function deleteNoteById(noteId, event) {
+        async function deleteNoteById(noteId, event) {
             event.stopPropagation();
             if (confirm('Yakin ingin menghapus note ini?')) {
-                notes = notes.filter(n => n.id !== noteId);
-                localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
-                displayNotes(notes);
+                try {
+                    console.log('Deleting note:', noteId);
+                    
+                    const { error } = await supabase
+                        .from('notes')
+                        .delete()
+                        .eq('id', noteId);
+                    
+                    if (error) {
+                        console.error('Supabase delete error:', error);
+                        throw new Error('Failed to delete note: ' + error.message);
+                    }
+                    
+                    // Remove from local notes array
+                    notes = notes.filter(n => n.id !== noteId);
+                    localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
+                    displayNotes(notes);
+                    console.log('Note deleted successfully');
+                    
+                } catch (error) {
+                    console.error('Error deleting note:', error);
+                    alert('Gagal menghapus note dari server. Menggunakan penyimpanan lokal sebagai backup.');
+                    
+                    // Fallback to localStorage
+                    notes = notes.filter(n => n.id !== noteId);
+                    localStorage.setItem('ayafinance_notes', JSON.stringify(notes));
+                    displayNotes(notes);
+                }
             }
         }
 
@@ -861,16 +990,26 @@
         document.getElementById('noteForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            console.log('=== FORM SUBMIT DEBUG ===');
+            console.log('Form submitted - attempting to save note');
+            
             const activeTab = document.querySelector('.content-tab.text-blue-600');
             const isTable = activeTab.id === 'tableTab';
+            
+            // Get current user for user_id
+            const currentUser = checkAuth();
+            const userId = currentUser?.id || currentUser?.user_id || '00000000-0000-0000-0000-000000000000';
             
             const noteData = {
                 title: document.getElementById('noteTitle').value,
                 category: document.getElementById('noteCategory').value,
                 type: isTable ? 'table' : 'text',
-                content: isTable ? document.getElementById('customTable').outerHTML : quill.root.innerHTML
+                content: isTable ? document.getElementById('customTable').outerHTML : quill.root.innerHTML,
+                user_id: userId
             };
             
+            console.log('NoteData prepared:', noteData);
+            console.log('Calling saveNote function...');
             saveNote(noteData);
             closeNoteModal();
             
@@ -907,13 +1046,23 @@
             }
         });
 
+        // User authentication functions
+        function checkAuth() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                return null;
+            }
+            return JSON.parse(currentUser);
+        }
+
         function initializeProfile() {
             // Set default profile data
             const profileAvatar = document.getElementById('profileAvatar');
             const welcomeUser = document.getElementById('welcomeUser');
             
-            // Generate avatar initials
-            const userName = 'Admin';
+            // Get current user from localStorage or auth system
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userName = currentUser.name || currentUser.email || 'User';
             const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
             
             profileAvatar.innerHTML = `
