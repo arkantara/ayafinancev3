@@ -268,18 +268,23 @@
                 if (!loginSuccess) {
                     console.log('🔄 Trying fallback API login...');
                     try {
+                        const requestBody = {
+                            username: email,
+                            password: password
+                        };
+                        console.log('📤 Sending request to /api/login:', requestBody);
+                        
                         const response = await fetch('/api/login', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                username: email,
-                                password: password
-                            })
+                            body: JSON.stringify(requestBody)
                         });
                         
+                        console.log('📡 Response status:', response.status);
                         const result = await response.json();
+                        console.log('📨 Response data:', result);
                         
                         if (result.success) {
                             console.log('✅ Fallback API login successful:', result);
@@ -287,9 +292,14 @@
                             userData = result.user;
                         } else {
                             console.log('❌ Fallback API login failed:', result.message);
+                            // Use the server's error message
+                            showError(result.message || 'Login gagal');
+                            return; // Early return to show the server error
                         }
                     } catch (apiError) {
-                        console.error('❌ API login error:', apiError);
+                        console.error('❌ API login network error:', apiError);
+                        showError('Koneksi ke server gagal. Silakan coba lagi.');
+                        return; // Early return on network error
                     }
                 }
                 
@@ -302,9 +312,8 @@
                     document.getElementById('loveYouBtn').onclick = function() {
                         window.location.href = 'dashboard.html';
                     };
-                } else {
-                    showError('Email atau password salah');
                 }
+                // Don't show generic error if specific error was already shown
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');
             } finally {
