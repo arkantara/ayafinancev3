@@ -9,6 +9,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Load environment variables and initialize Supabase -->
+    <script src="/config.js"></script>
+    <script>
+        // Initialize Supabase client with environment variables
+        let supabase;
+        try {
+            if (window.ENV && window.ENV.SUPABASE_URL && window.ENV.SUPABASE_KEY) {
+                supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
+                console.log('✅ Supabase client initialized successfully');
+            } else {
+                console.error('❌ Missing environment variables for Supabase');
+                throw new Error('Supabase configuration not found');
+            }
+        } catch (error) {
+            console.error('❌ Failed to initialize Supabase:', error);
+            supabase = null;
+        }
+    </script>
+    
     <!-- Suppress Tailwind CDN warning -->
     <script>
         // Override console.warn to hide Tailwind CDN warning in production
@@ -158,61 +177,116 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            
+            // Check if Supabase is initialized
+            if (!supabase) {
+                showError('Koneksi database tidak tersedia. Silakan refresh halaman.');
+                return;
+            }
+            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            
             if (!email || !password) {
                 showError('Silakan isi email dan password');
                 return;
             }
+            
             showLoading(true);
+            
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    showError(error.message || 'Login gagal');
-                } else {
-                    showSuccess('Login berhasil! love you aya');
-                    if (data && data.user) {
-                        // Extract user info from Supabase response
-                        const user = data.user;
-                        const uuid = user.id.split(':')[0];
+                console.log('🔄 Attempting login for:', email);
+                let loginSuccess = false;
+                let userData = null;
+                
+                // Try Supabase authentication first
+                if (supabase) {
+                    try {
+                        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                         
-                        // Fetch complete user data from users table
-                        const { data: dbUser, error: dbError } = await supabase
-                            .from('users')
-                            .select('*')
-                            .eq('id', uuid)
-                            .single();
-                        
-                        let userData;
-                        if (dbError || !dbUser) {
-                            console.warn('Could not fetch user data from database:', dbError?.message);
-                            // Fallback to auth metadata
-                            userData = {
-                                id: uuid, 
-                                email: user.email,
-                                username: user.user_metadata?.username || user.email?.split('@')[0],
-                                full_name: user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0]
-                            };
+                        if (!error && data?.user) {
+                            console.log('✅ Supabase login successful:', data);
+                            loginSuccess = true;
+                            
+                            // Extract user info from Supabase response
+                            const user = data.user;
+                            const uuid = user.id.split(':')[0];
+                            
+                            // Fetch complete user data from users table
+                            const { data: dbUser, error: dbError } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('id', uuid)
+                                .single();
+                            
+                            if (dbError || !dbUser) {
+                                console.warn('Could not fetch user data from database:', dbError?.message);
+                                // Fallback to auth metadata
+                                userData = {
+                                    id: uuid, 
+                                    email: user.email,
+                                    username: user.user_metadata?.username || user.email?.split('@')[0],
+                                    full_name: user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0]
+                                };
+                            } else {
+                                // Use complete database data
+                                userData = {
+                                    id: dbUser.id,
+                                    email: dbUser.email || user.email,
+                                    username: dbUser.username,
+                                    full_name: dbUser.full_name,
+                                    photo_url: dbUser.photo_url,
+                                    create_at: dbUser.create_at
+                                };
+                            }
                         } else {
-                            // Use complete database data
-                            userData = {
-                                id: dbUser.id,
-                                email: dbUser.email || user.email,
-                                username: dbUser.username,
-                                full_name: dbUser.full_name,
-                                photo_url: dbUser.photo_url,
-                                create_at: dbUser.create_at
-                            };
+                            console.log('❌ Supabase login failed:', error?.message);
                         }
-                        
-                        localStorage.setItem('currentUser', JSON.stringify(userData));
-
-                        // Show modal
-                        document.getElementById('loginSuccessModal').style.display = 'flex';
-                        document.getElementById('loveYouBtn').onclick = function() {
-                            window.location.href = 'dashboard.html';
-                        };
+                    } catch (supabaseError) {
+                        console.warn('⚠️ Supabase error, trying fallback:', supabaseError);
                     }
+                }
+                
+                // Fallback to simple API endpoint if Supabase fails
+                if (!loginSuccess) {
+                    console.log('🔄 Trying fallback API login...');
+                    try {
+                        const response = await fetch('/api/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                username: email,
+                                password: password
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            console.log('✅ Fallback API login successful:', result);
+                            loginSuccess = true;
+                            userData = result.user;
+                        } else {
+                            console.log('❌ Fallback API login failed:', result.message);
+                        }
+                    } catch (apiError) {
+                        console.error('❌ API login error:', apiError);
+                    }
+                }
+                
+                if (loginSuccess && userData) {
+                    showSuccess('Login berhasil! love you aya');
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+
+                    // Show modal
+                    document.getElementById('loginSuccessModal').style.display = 'flex';
+                    document.getElementById('loveYouBtn').onclick = function() {
+                        window.location.href = 'dashboard.html';
+                    };
+                } else {
+                    showError('Email atau password salah');
                 }
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');
