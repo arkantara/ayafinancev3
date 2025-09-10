@@ -10,22 +10,42 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- Load environment variables and initialize Supabase -->
-    <script src="/config.js"></script>
     <script>
-        // Initialize Supabase client with environment variables
+        // Initialize Supabase client
         let supabase;
-        try {
-            if (window.ENV && window.ENV.SUPABASE_URL && window.ENV.SUPABASE_KEY) {
-                supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
-                console.log('✅ Supabase client initialized successfully');
-            } else {
-                console.error('❌ Missing environment variables for Supabase');
-                throw new Error('Supabase configuration not found');
+        
+        // Function to initialize Supabase
+        async function initializeSupabase() {
+            try {
+                // Try to load config from server endpoint
+                const configResponse = await fetch('/config.js');
+                if (configResponse.ok) {
+                    const configText = await configResponse.text();
+                    // Execute the config script to set window.ENV
+                    eval(configText);
+                }
+                
+                // Check if ENV is available
+                if (window.ENV && window.ENV.SUPABASE_URL && window.ENV.SUPABASE_KEY) {
+                    supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
+                    console.log('✅ Supabase client initialized successfully');
+                    return true;
+                } else {
+                    console.warn('⚠️ Environment variables not available, Supabase disabled');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase:', error);
+                return false;
             }
-        } catch (error) {
-            console.error('❌ Failed to initialize Supabase:', error);
-            supabase = null;
         }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSupabase().then(supabaseReady => {
+                console.log('Supabase ready:', supabaseReady);
+            });
+        });
     </script>
     
     <!-- Suppress Tailwind CDN warning -->
@@ -178,12 +198,6 @@
         async function handleLogin(e) {
             e.preventDefault();
             
-            // Check if Supabase is initialized
-            if (!supabase) {
-                showError('Koneksi database tidak tersedia. Silakan refresh halaman.');
-                return;
-            }
-            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
@@ -199,9 +213,10 @@
                 let loginSuccess = false;
                 let userData = null;
                 
-                // Try Supabase authentication first
+                // Try Supabase authentication first (if available)
                 if (supabase) {
                     try {
+                        console.log('🔄 Trying Supabase authentication...');
                         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                         
                         if (!error && data?.user) {
@@ -245,9 +260,11 @@
                     } catch (supabaseError) {
                         console.warn('⚠️ Supabase error, trying fallback:', supabaseError);
                     }
+                } else {
+                    console.log('⚠️ Supabase not available, skipping to fallback...');
                 }
                 
-                // Fallback to simple API endpoint if Supabase fails
+                // Try fallback API endpoint (always try this if Supabase fails or unavailable)
                 if (!loginSuccess) {
                     console.log('🔄 Trying fallback API login...');
                     try {
