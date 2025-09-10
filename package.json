@@ -1,16 +1,10 @@
 {
   "name": "ayafinancev3",
   "version": "1.0.0",
-<<<<<<< HEAD
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js"
-=======
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
   },
   "keywords": [],
   "author": "",
@@ -18,7 +12,6 @@
   "description": "",
   "dependencies": {
     "@supabase/supabase-js": "^2.51.0",
-<<<<<<< HEAD
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -26,10 +19,3 @@
     "pg": "^8.16.3"
   }
 }
-=======
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "openai": "^5.10.2"
-  }
-}
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f

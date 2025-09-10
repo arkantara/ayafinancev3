@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "version": 2,
   "builds": [
     {
@@ -11,15 +10,6 @@
     {
       "source": "/(.*)",
       "destination": "/index.js"
-=======
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
     }
   ],
   "headers": [
@@ -35,7 +25,6 @@
           "value": "nosniff"
         }
       ]
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
     }
   ]
 }

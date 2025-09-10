@@ -34,19 +34,10 @@ router.post('/login', async (req, res) => {
         message: 'Login berhasil',
         user: {
           id: user.id,
-<<<<<<< HEAD
-=======
-          name: user.name,
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
           full_name: user.full_name,
           email: user.email,
           username: user.username,
           role: user.role,
-<<<<<<< HEAD
-          photo_url: user.photo_url,
-=======
-          profile_picture: user.profile_picture,
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
           is_active: user.is_active
         }
       });
@@ -76,11 +67,6 @@ router.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
-<<<<<<< HEAD
-      'INSERT INTO users (full_name, email, username, password, is_active, create_at) VALUES ($1, $2, $3, $4, TRUE, NOW())',
-=======
-      'INSERT INTO users (name, email, username, password, is_active, created_at) VALUES ($1, $2, $3, $4, TRUE, NOW())',
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
       [name, email, username, hashedPassword]
     );
     if (result.rowCount > 0) {

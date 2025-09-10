@@ -105,53 +105,6 @@
     </div> -->
 
     <script>
-<<<<<<< HEAD
-        // Smart environment variable handling untuk development & production
-        
-        // Cek jika environment variables tersedia (dari server injection)
-        const hasServerEnvVars = window.SUPABASE_URL && window.SUPABASE_KEY;
-        
-        // Fallback credentials untuk development localhost
-        const fallbackConfig = {
-            url: 'https://jjieqhvfadoqkahpqdvl.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'
-        };
-        
-        // Gunakan server env vars jika tersedia, fallback untuk localhost
-        const supabaseUrl = window.SUPABASE_URL || fallbackConfig.url;
-        const supabaseKey = window.SUPABASE_KEY || fallbackConfig.key;
-        
-        console.log('[Login] Config source:', hasServerEnvVars ? 'Server Environment' : 'Localhost Fallback');
-        console.log('[Login] Environment check:', {
-            hasServerVars: hasServerEnvVars,
-            url: !!supabaseUrl,
-            key: !!supabaseKey
-        });
-
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        console.log('[Login] Supabase client initialized successfully');
-=======
-        // Initialize Supabase client using Railway environment variables
-        let supabase;
-        
-        // Railway will inject environment variables via server.js
-        const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
-        const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
-        
-        // Only show detailed logs in development (using window.IS_PRODUCTION from CSS script)
-        if (!window.IS_PRODUCTION) {
-            console.log('🚂 Initializing Supabase for Railway deployment...');
-            console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
-            console.log('🔑 Supabase Key configured:', !!supabaseKey);
-            console.log('🌍 Environment variables from Railway:', {
-                url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
-                key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
-            });
-        }
-        
-        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
->>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
-
         function showLoading(isLoading) {
             const submitBtn = document.getElementById('submitBtn');
             const buttonText = document.getElementById('buttonText');
