@@ -45,7 +45,11 @@ router.put('/update', async (req, res) => {
        WHERE id = $7 AND user_id = $8`,
       [
         type,
+<<<<<<< HEAD
         parseFloat(amount),
+=======
+        parseFloat(String(amount).replace(/\./g, '')),
+>>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
         category_id,
         category,
         description,
@@ -65,4 +69,8 @@ router.put('/update', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f

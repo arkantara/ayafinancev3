@@ -28,6 +28,7 @@ app.use((req, res, next) => {
         // Inject environment variables di script tag
         if (processedHtml.includes('<script>')) {
           const isProduction = process.env.NODE_ENV === 'production';
+<<<<<<< HEAD
           const isDevelopment = process.env.NODE_ENV !== 'production';
           
           let supabaseUrl = process.env.SUPABASE_URL;
@@ -43,6 +44,15 @@ app.use((req, res, next) => {
           // Production: Strict validation
           if (isProduction && (!supabaseUrl || !supabaseKey)) {
             console.error('❌ Missing Supabase environment variables in production');
+=======
+          const supabaseUrl = process.env.SUPABASE_URL;
+          const supabaseKey = process.env.SUPABASE_KEY;
+          
+          // Validasi environment variables
+          if (!supabaseUrl || !supabaseKey) {
+            console.error('❌ Missing Supabase environment variables');
+            console.error('💡 Make sure SUPABASE_URL and SUPABASE_KEY are set in Railway');
+>>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
             return res.status(500).send('Server configuration error. Please contact administrator.');
           }
           

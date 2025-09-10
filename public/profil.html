@@ -85,6 +85,7 @@
     let currentUser;
     
     try {
+<<<<<<< HEAD
         // Smart environment variable handling untuk development & production
         
         // Cek jika environment variables tersedia (dari server injection)
@@ -109,6 +110,22 @@
         
         supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
         console.log('[Profil] Supabase client initialized successfully');
+=======
+        // Initialize Supabase client using Railway environment variables
+        const supabaseUrl = window.SUPABASE_URL || 'https://jjieqhvfadoqkahpqdvl.supabase.co';
+        const supabaseKey = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM';
+        
+        console.log('🚂 Profil initializing with Railway environment variables...');
+        console.log('📍 Supabase URL:', supabaseUrl.substring(0, 8) + '*****.supabase.co');
+        console.log('🔑 Supabase Key configured:', !!supabaseKey);
+        console.log('🌍 Environment source:', {
+            url: !!window.SUPABASE_URL ? 'Railway' : 'Fallback',
+            key: !!window.SUPABASE_KEY ? 'Railway' : 'Fallback'
+        });
+        
+        supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        console.log('✅ Supabase client initialized');
+>>>>>>> e0c4c491ffb3c5d82991964fffcacd397cd65b8f
         
         currentUser = JSON.parse(localStorage.getItem('currentUser'));
         console.log('👤 Current user:', currentUser);
