@@ -4,84 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ayaFinance</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><rect x='20' y='35' width='60' height='30' rx='5' fill='white'/><rect x='25' y='40' width='50' height='20' rx='3' fill='%233B82F6'/></svg>" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Load environment variables and initialize Supabase -->
-    <script>
-        // Initialize Supabase client
-        let supabase;
-        
-        // Function to initialize Supabase
-        async function initializeSupabase() {
-            try {
-                console.log('🔄 Loading config from /config.js...');
-                
-                // Try to load config from server endpoint
-                const configResponse = await fetch('/config.js');
-                console.log('📡 Config response status:', configResponse.status);
-                console.log('📡 Config response ok:', configResponse.ok);
-                
-                if (configResponse.ok) {
-                    const configText = await configResponse.text();
-                    console.log('📄 Config text received (full):', configText);
-                    console.log('📄 Config text length:', configText.length);
-                    
-                    // Execute the config script to set window.ENV
-                    eval(configText);
-                    console.log('💾 After eval, window.ENV:', window.ENV);
-                } else {
-                    console.error('❌ Config fetch failed with status:', configResponse.status);
-                }
-                
-                // Check if ENV is available
-                if (window.ENV && window.ENV.SUPABASE_URL && window.ENV.SUPABASE_KEY) {
-                    console.log('✅ Environment variables found:');
-                    console.log('  - SUPABASE_URL:', window.ENV.SUPABASE_URL ? 'SET' : 'NOT SET');
-                    console.log('  - SUPABASE_KEY:', window.ENV.SUPABASE_KEY ? 'SET' : 'NOT SET');
-                    console.log('  - PLATFORM:', window.ENV.PLATFORM);
-                    
-                    supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_KEY);
-                    console.log('✅ Supabase client initialized successfully');
-                    return true;
-                } else {
-                    console.warn('⚠️ Environment variables not available, Supabase disabled');
-                    console.log('Debug info:');
-                    console.log('  - window.ENV exists:', !!window.ENV);
-                    console.log('  - window.ENV content:', window.ENV);
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize Supabase:', error);
-                return false;
-            }
-        }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeSupabase().then(supabaseReady => {
-                console.log('Supabase ready:', supabaseReady);
-            });
-        });
-    </script>
-    
-    <!-- Suppress Tailwind CDN warning -->
-    <script>
-        // Override console.warn to hide Tailwind CDN warning in production
-        const originalWarn = console.warn;
-        console.warn = function(...args) {
-            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
-                // Skip Tailwind CDN warning
-                return;
-            }
-            originalWarn.apply(console, args);
-        };
-        
-        // Set production detection
-        window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    </script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center min-h-screen">
     <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md mx-4 border border-gray-100">
@@ -163,6 +88,12 @@
     </div> -->
 
     <script>
+        // Ganti URL dan anon key dengan milik Anda dari dashboard Supabase
+        const supabase = window.supabase.createClient(
+            'https://jjieqhvfadoqkahpqdvl.supabase.co', // Ganti dengan URL project Anda
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'                 // Ganti dengan anon key Anda
+        );
+
         function showLoading(isLoading) {
             const submitBtn = document.getElementById('submitBtn');
             const buttonText = document.getElementById('buttonText');
@@ -216,123 +147,31 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            
             if (!email || !password) {
                 showError('Silakan isi email dan password');
                 return;
             }
-            
             showLoading(true);
-            
             try {
-                console.log('🔄 Attempting login for:', email);
-                let loginSuccess = false;
-                let userData = null;
-                
-                // Try Supabase authentication first (if available)
-                if (supabase) {
-                    try {
-                        console.log('🔄 Trying Supabase authentication...');
-                        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                        
-                        if (!error && data?.user) {
-                            console.log('✅ Supabase login successful:', data);
-                            loginSuccess = true;
-                            
-                            // Extract user info from Supabase response
-                            const user = data.user;
-                            const uuid = user.id.split(':')[0];
-                            
-                            // Fetch complete user data from users table
-                            const { data: dbUser, error: dbError } = await supabase
-                                .from('users')
-                                .select('*')
-                                .eq('id', uuid)
-                                .single();
-                            
-                            if (dbError || !dbUser) {
-                                console.warn('Could not fetch user data from database:', dbError?.message);
-                                // Fallback to auth metadata
-                                userData = {
-                                    id: uuid, 
-                                    email: user.email,
-                                    username: user.user_metadata?.username || user.email?.split('@')[0],
-                                    full_name: user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0]
-                                };
-                            } else {
-                                // Use complete database data
-                                userData = {
-                                    id: dbUser.id,
-                                    email: dbUser.email || user.email,
-                                    username: dbUser.username,
-                                    full_name: dbUser.full_name,
-                                    photo_url: dbUser.photo_url,
-                                    create_at: dbUser.create_at
-                                };
-                            }
-                        } else {
-                            console.log('❌ Supabase login failed:', error?.message);
-                        }
-                    } catch (supabaseError) {
-                        console.warn('⚠️ Supabase error, trying fallback:', supabaseError);
-                    }
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    showError(error.message || 'Login gagal');
                 } else {
-                    console.log('⚠️ Supabase not available, skipping to fallback...');
-                }
-                
-                // Try fallback API endpoint (always try this if Supabase fails or unavailable)
-                if (!loginSuccess) {
-                    console.log('🔄 Trying fallback API login...');
-                    try {
-                        const requestBody = {
-                            username: email,
-                            password: password
-                        };
-                        console.log('📤 Sending request to /api/login:', requestBody);
-                        
-                        const response = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(requestBody)
-                        });
-                        
-                        console.log('📡 Response status:', response.status);
-                        const result = await response.json();
-                        console.log('📨 Response data:', result);
-                        
-                        if (result.success) {
-                            console.log('✅ Fallback API login successful:', result);
-                            loginSuccess = true;
-                            userData = result.user;
-                        } else {
-                            console.log('❌ Fallback API login failed:', result.message);
-                            // Use the server's error message
-                            showError(result.message || 'Login gagal');
-                            return; // Early return to show the server error
-                        }
-                    } catch (apiError) {
-                        console.error('❌ API login network error:', apiError);
-                        showError('Koneksi ke server gagal. Silakan coba lagi.');
-                        return; // Early return on network error
-                    }
-                }
-                
-                if (loginSuccess && userData) {
                     showSuccess('Login berhasil! love you aya');
-                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    if (data && data.user) {
+    const uuid = data.user.id.split(':')[0];
+    const name = data.user.user_metadata?.username || data.user.email;
+    localStorage.setItem('currentUser', JSON.stringify({ id: uuid, name }));
 
-                    // Show modal
-                    document.getElementById('loginSuccessModal').style.display = 'flex';
-                    document.getElementById('loveYouBtn').onclick = function() {
-                        window.location.href = 'dashboard.html';
-                    };
+    // Show modal
+    document.getElementById('loginSuccessModal').style.display = 'flex';
+    document.getElementById('loveYouBtn').onclick = function() {
+        window.location.href = 'dashboard.html';
+    };
+}
                 }
-                // Don't show generic error if specific error was already shown
             } catch (err) {
                 showError('Koneksi bermasalah. Silakan coba lagi.');
             } finally {

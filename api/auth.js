@@ -38,6 +38,7 @@ router.post('/login', async (req, res) => {
           email: user.email,
           username: user.username,
           role: user.role,
+          photo_url: user.photo_url,
           is_active: user.is_active
         }
       });
@@ -67,6 +68,7 @@ router.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
+      'INSERT INTO users (full_name, email, username, password, is_active, create_at) VALUES ($1, $2, $3, $4, TRUE, NOW())',
       [name, email, username, hashedPassword]
     );
     if (result.rowCount > 0) {

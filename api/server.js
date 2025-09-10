@@ -28,36 +28,7 @@ const supabase = createClient(
 const openai = new OpenAI({
   apiKey: 'AIzaSyCGwKUderqu6J_9JKdQ-7ILPokFJ7apsPo',
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
-});
-
-// ─── Authentication middleware ───
-const authenticateUser = async (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
-    }
-
-    const token = authHeader.substring(7);
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // Add user and supabase client to request
-    req.user = user;
-    req.supabase = supabase;
-    next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    res.status(500).json({ error: 'Authentication failed' });
-  }
-};
-
-// ─── Import and setup budget routes ───
-const budgetRoutes = require('./budgets');
-app.use('/api/budgets', authenticateUser, budgetRoutes);
+  });
 
 // ─── Chat endpoint ───
 app.post('/api/chat', async (req, res) => {

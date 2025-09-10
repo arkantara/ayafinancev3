@@ -45,6 +45,7 @@ router.put('/update', async (req, res) => {
        WHERE id = $7 AND user_id = $8`,
       [
         type,
+        parseFloat(amount),
         category_id,
         category,
         description,
@@ -64,3 +65,4 @@ router.put('/update', async (req, res) => {
   }
 });
 
+module.exports = router;
