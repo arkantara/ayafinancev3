@@ -259,7 +259,7 @@
                 showLoading(true);
 
                 // Load categories from API
-                const response = await fetch('/api/budgets/categories');
+                const response = await fetch('/api/categories');
                 if (response.ok) {
                     categories = await response.json();
                     console.log('[Budget] Categories loaded:', categories);
