@@ -43,12 +43,19 @@ app.post('/api/login', (req, res) => {
   
   console.log('Login attempt:', { username });
   
-  // Simplified validation untuk testing
-  if (username && password) {
-    const user = { id: 1, username, email: username };
+  // Simplified validation untuk testing - accept any valid credentials
+  if (username && password && username.includes('@') && password.length >= 5) {
+    const user = { 
+      id: 1, 
+      username: username.split('@')[0], 
+      email: username,
+      full_name: username.split('@')[0].charAt(0).toUpperCase() + username.split('@')[0].slice(1)
+    };
+    console.log('✅ Login successful for:', username);
     res.json({ success: true, message: 'Login berhasil', user });
   } else {
-    res.json({ success: false, message: 'Username/Email atau password salah' });
+    console.log('❌ Login failed - invalid credentials format');
+    res.json({ success: false, message: 'Email atau password tidak valid' });
   }
 });
 
