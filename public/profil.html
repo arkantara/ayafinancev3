@@ -3,32 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Profil Saya - ayaFinance</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><rect x='20' y='35' width='60' height='30' rx='5' fill='white'/><rect x='25' y='40' width='50' height='20' rx='3' fill='%233B82F6'/></svg>" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    
-    <!-- Suppress Tailwind CDN warning -->
-    <script>
-        // Override console.warn to hide Tailwind CDN warning in production
-        const originalWarn = console.warn;
-        console.warn = function(...args) {
-            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
-                return; // Skip Tailwind CDN warning
-            }
-            originalWarn.apply(console, args);
-        };
-        
-        // Set production detection
-        window.IS_PRODUCTION = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    </script>
 </head>
 <body class="bg-gray-50">
     <div class="max-w-lg mx-auto mt-10 bg-white p-8 rounded-xl shadow">
         <h2 class="text-2xl font-bold mb-6">Profil Saya</h2>
         <form id="profileForm" class="space-y-4">
             <div class="flex flex-col items-center mb-4">
-                    <img id="profilePhoto" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" class="w-32 h-32 rounded-full object-cover mb-3 cursor-pointer hover:opacity-80 transition-opacity shadow-lg" alt="Foto Profil" title="Klik untuk preview">
+                    <img id="profilePhoto" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" class="w-24 h-24 rounded-full object-cover mb-2" alt="Foto Profil">
                 <input type="file" id="photoInput" accept="image/*" class="hidden">
                 <button type="button" id="uploadBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Upload Foto</button>
             </div>
@@ -52,99 +36,18 @@
         </form>
     </div>
 
-    <!-- Modal Preview Foto Profil -->
-    <div id="photoPreviewModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50 transition-opacity duration-300">
-        <div class="relative max-w-4xl max-h-screen p-4 flex items-center justify-center">
-            <!-- Close Button -->
-            <button id="closeModal" class="absolute -top-2 -right-2 bg-white text-black w-8 h-8 rounded-full hover:bg-gray-200 transition-colors z-10 flex items-center justify-center shadow-lg">
-                <i class="fas fa-times text-sm"></i>
-            </button>
-            
-            <!-- Loading Spinner -->
-            <div id="imageLoader" class="absolute inset-0 flex items-center justify-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-            </div>
-            
-            <!-- Preview Image -->
-            <img id="modalImage" src="" alt="Preview Foto Profil" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl opacity-0 transition-opacity duration-300 min-h-32 min-w-32">
-        </div>
-        
-        <!-- Image Info - Outside the image container -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg backdrop-blur-sm pointer-events-none">
-            <p class="text-sm text-center">
-                <i class="fas fa-user-circle mr-2"></i>
-                Foto Profil • Tekan <kbd class="bg-gray-600 px-1 rounded text-xs">ESC</kbd> atau klik di luar untuk menutup
-            </p>
-        </div>
-    </div>
-
     <script>
-    console.log('📄 Script starting...');
-    
-    let supabaseClient;
-    let currentUser;
-    
-    try {
-        // Smart environment variable handling untuk development & production
-        
-        // Cek jika environment variables tersedia (dari server injection)
-        const hasServerEnvVars = window.SUPABASE_URL && window.SUPABASE_KEY;
-        
-        // Fallback credentials untuk development localhost
-        const fallbackConfig = {
-            url: 'https://jjieqhvfadoqkahpqdvl.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM'
-        };
-        
-        // Gunakan server env vars jika tersedia, fallback untuk localhost
-        const supabaseUrl = window.SUPABASE_URL || fallbackConfig.url;
-        const supabaseKey = window.SUPABASE_KEY || fallbackConfig.key;
-        
-        console.log('[Profil] Config source:', hasServerEnvVars ? 'Server Environment' : 'Localhost Fallback');
-        console.log('[Profil] Environment check:', {
-            hasServerVars: hasServerEnvVars,
-            url: !!supabaseUrl,
-            key: !!supabaseKey
-        });
-        
-        supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-        console.log('[Profil] Supabase client initialized successfully');
-        
-        currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        console.log('👤 Current user:', currentUser);
-        
-        if (!currentUser) {
-            console.warn('⚠️ No user found in localStorage, redirecting to login...');
-            window.location.href = 'login.html';
-            // Don't return here, let the page continue loading for debugging
-        }
-    } catch (error) {
-        console.error('❌ Script initialization error:', error);
-    }
+    const supabaseClient = supabase.createClient('https://jjieqhvfadoqkahpqdvl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqaWVxaHZmYWRvcWthaHBxZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjExODEsImV4cCI6MjA2ODEzNzE4MX0.8rwAFQew3HbzdBgoseq_DX-R6YwJB2Fk5OMgm4KrmBM');
+    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 
     async function loadProfile() {
-        if (!currentUser || !supabaseClient) {
-            console.error('❌ Missing currentUser or supabaseClient');
-            return;
-        }
-        
-        try {
-            const { data, error } = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
-            if (error) {
-                console.error('❌ Error loading profile:', error);
-                return;
-            }
-            
-            if (data) {
-                document.getElementById('username').value = data.username || '';
-                document.getElementById('email').value = data.email || '';
-                document.getElementById('fullname').value = data.full_name || '';
-                document.getElementById('profilePhoto').src = data.photo_url || 'https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff';
-                console.log('✅ Profile loaded successfully');
-            }
-        } catch (error) {
-            console.error('❌ Exception in loadProfile:', error);
+        const { data, error } = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
+        if (data) {
+            document.getElementById('username').value = data.username || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('fullname').value = data.full_name || '';
+            document.getElementById('profilePhoto').src = data.photo_url || 'https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff';
         }
     }
 
@@ -174,18 +77,6 @@
     }
     const { publicUrl } = supabaseClient.storage.from('profile-photos').getPublicUrl(filePath).data;
     document.getElementById('profilePhoto').src = publicUrl;
-    
-    // Show success message
-    const successDiv = document.createElement('div');
-    successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300';
-    successDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Foto berhasil diupload! Klik foto untuk preview.';
-    document.body.appendChild(successDiv);
-    
-    setTimeout(() => {
-        successDiv.style.opacity = '0';
-        setTimeout(() => successDiv.remove(), 300);
-    }, 4000);
-    
     await supabaseClient.from('users').update({ photo_url: publicUrl }).eq('id', currentUser.id);
 };
 
@@ -214,116 +105,7 @@ document.getElementById('profileForm').onsubmit = async function(e) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Profil page loaded');
     loadProfile();
-    
-    // Photo Preview Modal Handler
-    const profilePhoto = document.getElementById('profilePhoto');
-    const modal = document.getElementById('photoPreviewModal');
-    const modalImage = document.getElementById('modalImage');
-    const closeModal = document.getElementById('closeModal');
-    
-    if (!profilePhoto || !modal) {
-        console.error('❌ Modal elements not found!');
-        return;
-    }
-    
-    // Open modal when profile photo is clicked
-    profilePhoto.addEventListener('click', function(e) {
-        console.log('🖱️ Profile photo clicked');
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const photoSrc = this.src;
-        console.log('📷 Photo source:', photoSrc);
-        
-        // Don't show modal for default avatar
-        if (photoSrc.includes('ui-avatars.com')) {
-            console.log('⚠️ Default avatar detected');
-            // Show a nice notification instead
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300';
-            alertDiv.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Upload foto profil terlebih dahulu untuk melihat preview';
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 300);
-            }, 3000);
-            return;
-        }
-        
-        console.log('✅ Showing modal for custom photo');
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        
-        // Reset image state
-        modalImage.style.opacity = '0';
-        const loader = document.getElementById('imageLoader');
-        if (loader) loader.style.display = 'flex';
-        
-        // Load image
-        console.log('🔄 Loading image:', photoSrc);
-        
-        // Setup image loading handlers
-        modalImage.onload = function() {
-            console.log('✅ Image loaded successfully');
-            console.log('📐 Image dimensions:', this.naturalWidth, 'x', this.naturalHeight);
-            console.log('📏 Image display size:', this.offsetWidth, 'x', this.offsetHeight);
-            this.style.opacity = '1';
-            this.style.display = 'block'; // Ensure it's visible
-            const loader = document.getElementById('imageLoader');
-            if (loader) loader.style.display = 'none';
-        };
-        
-        modalImage.onerror = function() {
-            console.error('❌ Failed to load image:', photoSrc);
-            this.style.opacity = '1';
-            this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjx0ZXh0IHg9IjEyIiB5PSIxNiIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI4Ij5FcnJvcjwvdGV4dD4KPHN2Zz4K';
-            const loader = document.getElementById('imageLoader');
-            if (loader) loader.style.display = 'none';
-        };
-        
-        modalImage.src = photoSrc;
-        
-        // Prevent body scroll when modal is open
-        document.body.style.overflow = 'hidden';
-        
-        // Add fade-in animation to modal
-        setTimeout(() => {
-            modal.style.opacity = '1';
-        }, 10);
-    });
-    
-    // Function to close modal with animation
-    function closeModalWithAnimation() {
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = 'auto';
-            modal.style.opacity = '1'; // Reset for next time
-        }, 300);
-    }
-    
-    // Close modal when close button is clicked
-    closeModal.addEventListener('click', closeModalWithAnimation);
-    
-    // Close modal when clicking outside the image
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModalWithAnimation();
-        }
-    });
-    
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            closeModalWithAnimation();
-        }
-    });
 });
     </script>
 </body>
